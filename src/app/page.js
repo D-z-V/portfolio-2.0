@@ -18,9 +18,10 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 const drawerWidth = 240;
 
 export default function Home() {
-  const [width, setWidth] = React.useState(0);
+  const [width, setWidth] = React.useState(1200);
 
   React.useEffect(() => {
+    setWidth(window.innerWidth);
     const handleResize = () => {
       setWidth(window.innerWidth);
     };
@@ -29,8 +30,6 @@ export default function Home() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-
 
   const theme = useMemo(
     () =>
