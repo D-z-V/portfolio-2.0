@@ -12,28 +12,32 @@ import Appbar from "@/components/Appbar"
 import Stories from "@/components/Stories";
 
 import { useMemo } from "react";
-
+import { useWindowSize } from "@uidotdev/usehooks";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+
 
 
 const drawerWidth = 240;
 
 export default function Home() {
-  const [width, setWidth] = React.useState(screen.width);
 
-  React.useEffect(() => {
-    setWidth(window.innerWidth);
+  const size = useWindowSize();
 
-    const handleResize = () => {
-      setWidth(window.innerWidth);
+  // const [width, setWidth] = React.useState(size.width);
 
-      // console.log(screen.width);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+  // React.useEffect(() => {
+  //   setWidth(window.innerWidth);
+
+  //   const handleResize = () => {
+  //     setWidth(window.innerWidth);
+
+  //     // console.log(screen.width);
+  //   };
+  //   window.addEventListener('resize', handleResize);
+  //   return () => {
+  //     window.removeEventListener('resize', handleResize);
+  //   };
+  // }, []);
 
   const theme = useMemo(
     () =>
@@ -68,9 +72,9 @@ export default function Home() {
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <ThemeProvider theme={theme}>
       <CssBaseline/>
-      {   width > 900 ? <Navbar drawerWidth={drawerWidth} /> : null   }
+      {   size.width > 900 ? <Navbar drawerWidth={drawerWidth} /> : null   }
 
-      {width < 900 ? (
+      { size.width < 900 ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden'  }}>
 
           <Appbar/>
@@ -103,7 +107,7 @@ export default function Home() {
         </Box>
         )}
 
-      {   width < 900 ? <Navbar drawerWidth={drawerWidth} /> : null  }
+      {   size.width < 900 ? <Navbar drawerWidth={drawerWidth} /> : null  }
           </ThemeProvider>
     </Box>
   )
