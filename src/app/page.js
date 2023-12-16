@@ -67,7 +67,7 @@ export default function Home() {
       {   width > 900 ? <Navbar drawerWidth={drawerWidth} /> : null   }
 
       {width < 900 ? (
-        <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '4rem' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column',  }}>
 
           <Appbar/>
 
