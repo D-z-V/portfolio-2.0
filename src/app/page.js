@@ -19,12 +19,15 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 const drawerWidth = 240;
 
 export default function Home() {
-  const [width, setWidth] = React.useState(1200);
+  const [width, setWidth] = React.useState(screen.width);
 
   React.useEffect(() => {
     setWidth(window.innerWidth);
+
     const handleResize = () => {
       setWidth(window.innerWidth);
+
+      // console.log(screen.width);
     };
     window.addEventListener('resize', handleResize);
     return () => {
