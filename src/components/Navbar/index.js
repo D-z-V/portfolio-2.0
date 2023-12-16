@@ -31,6 +31,8 @@ const Navbar = (props) => {
     const ref = React.useRef(null);
     // const [messages, setMessages] = React.useState(() => refreshMessages());
 
+    const [selectedNavIndex, setSelectedNavIndex] = React.useState('Home');
+
     React.useEffect(() => {
         ref.current.ownerDocument.body.scrollTop = 0;
         //   setMessages(refreshMessages());
@@ -67,8 +69,13 @@ const Navbar = (props) => {
                                 '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }, borderRadius: '12px', padding: '0.5rem',
                                 margin: '0 0.25rem'
                             }}
+                            onClick={() => setSelectedNavIndex(text)}
                         >
-                            <Icon />
+                            {
+
+                                selectedNavIndex === text ? <Icon selected /> : <Icon />
+                            }
+   
                             <ListItemText primary={text}
                                 sx={{
                                     marginLeft: '1.25rem',
@@ -89,9 +96,9 @@ const Navbar = (props) => {
                                 margin: '0 0.25rem'
 
                             }}
-
+                            onClick={() => setSelectedNavIndex(text)}
                         >
-                            <Icon />
+                            { selectedNavIndex === text ? <Icon selected /> : <Icon /> }
                             <ListItemText primary={text}
                                 sx={{
                                     marginLeft: '1.25rem',
@@ -154,8 +161,10 @@ const Navbar = (props) => {
 
                         {
                             Object.entries(TopNavComponents).map(([text, Icon]) => (
-                                <BottomNavigationAction key={text} label={text} icon={<Icon />}
+                                <BottomNavigationAction key={text} label={text} icon={selectedNavIndex === text ? <Icon selected /> : <Icon />}
                                     sx={{ color: 'white' }}
+
+                                    onClick={() => setSelectedNavIndex(text)}
                                 />
                             ))
                         }

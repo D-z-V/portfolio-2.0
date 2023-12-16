@@ -23,7 +23,7 @@ const Appbar = () => {
             alignItems: 'center',
             minHeight: '50px',
             cursor: 'pointer',
-            fontSize: '2.45rem',
+            fontSize: '2.25rem',
             // marginLeft: '0px', 
           }}
         >
@@ -36,10 +36,10 @@ const Appbar = () => {
         </Typography>
         <div>
           <IconButton size="large" color="inherit" aria-label="menu" >
-            <ProfileIcon height = {30} width = {30}/>
+            <ProfileIcon height = {27} width = {27}/>
           </IconButton>
           <IconButton size="large" color="inherit" aria-label="menu">
-            <ContactIcon height = {30} width = {30}/>
+            <ContactIcon height = {27} width = {27}/>
           </IconButton>
         </div>
       </Toolbar>
