@@ -1,95 +1,157 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import Navbar from "@/components/Navbar"
+import Box from '@mui/material/Box';
+import CssBaseline from '@mui/material/CssBaseline';
+
+import React from 'react';
+
+import Typography from '@mui/material/Typography';
+
+import Appbar from "@/components/Appbar"
+
+import { useMemo } from "react";
+
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+
+const drawerWidth = 240;
 
 export default function Home() {
+  const [width, setWidth] = React.useState(window.innerWidth);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        components: {
+          MuiCssBaseline: {
+            styleOverrides: {
+              body: {
+                "&::-webkit-scrollbar, & *::-webkit-scrollbar": {
+                  width: 3,
+                  borderRadius: 10,
+                },
+                "&::-webkit-scrollbar-track, & *::-webkit-scrollbar-track": {
+                  boxShadow: 'inset 0 0 6px rgba(0,0,0,0.3)',
+                  borderRadius: '10px',
+                  backgroundColor: 'black', // Set to your preferred background color
+                  marginTop: '4.25rem',
+                  marginBottom: '3.5rem',
+                },
+                "&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb": {
+                  borderRadius: 20,
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', // Set to your preferred light white color
+                  border: "3px solid rgba(255, 255, 255, 0.2)",
+                },
+              },
+            },
+          },
+        },
+    }), []);
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <Box sx={{ display: 'flex', height: '100vh' }}>
+      <ThemeProvider theme={theme}>
+      <CssBaseline/>
+      {   width > 900 ? <Navbar drawerWidth={drawerWidth} /> : null   }
+
+      {width < 900 ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '4rem' }}>
+
+          <Appbar/>
+
+
+
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` },
+              backgroundColor: 'black',
+              color: 'white'
+            }}
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+            <Typography paragraph>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+              tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
+              enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
+              imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
+              Convallis convallis tellus id interdum velit laoreet id donec ultrices.
+              Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
+              adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
+              nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
+              leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
+              feugiat vivamus at augue. At augue eget arcu dictum varius duis at
+              consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
+              sapien faucibus et molestie ac.
+            </Typography>
+            <Typography paragraph>
+              Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
+              eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
+              neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
+              tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
+              sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
+              tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
+              gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
+              et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
+              tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
+              eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
+              posuere sollicitudin aliquam ultrices sagittis orci a.
+            </Typography>
+          </Box>
+        </Box>
+      ) : (
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` },
+            backgroundColor: 'black',
+            color: 'white'
+          }}
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+          <Typography paragraph>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+            tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
+            enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
+            imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
+            Convallis convallis tellus id interdum velit laoreet id donec ultrices.
+            Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
+            adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
+            nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
+            leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
+            feugiat vivamus at augue. At augue eget arcu dictum varius duis at
+            consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
+            sapien faucibus et molestie ac.
+          </Typography>
+          <Typography paragraph>
+            Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
+            eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
+            neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
+            tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
+            sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
+            tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
+            gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
+            et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
+            tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
+            eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
+            posuere sollicitudin aliquam ultrices sagittis orci a.
+          </Typography>
+        </Box>
+        )}
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      {   width < 900 ? <Navbar drawerWidth={drawerWidth} /> : null  }
+          </ThemeProvider>
+    </Box>
   )
 }
