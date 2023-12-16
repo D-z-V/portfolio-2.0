@@ -30,10 +30,10 @@ const Navbar = (props) => {
     const [value, setValue] = React.useState(0);
     const ref = React.useRef(null);
     // const [messages, setMessages] = React.useState(() => refreshMessages());
-  
+
     React.useEffect(() => {
-      ref.current.ownerDocument.body.scrollTop = 0;
-    //   setMessages(refreshMessages());
+        ref.current.ownerDocument.body.scrollTop = 0;
+        //   setMessages(refreshMessages());
     }, [value]);
 
     const TopNavComponents = {
@@ -54,12 +54,7 @@ const Navbar = (props) => {
         <>
 
             <Typography variant="h4" noWrap component="div" sx={{ display: 'flex', alignItems: 'center', margin: '1.25rem 0 1.75rem 1rem', minHeight: '50px', cursor: 'pointer' }}>
-                <p
-                    className={`navbar__logo ${instagramLogoFont.className}`}
-                    style={{ padding: '0.5rem 0', margin: '0' }}
-                >
-                    Instagram
-                </p>
+                <p className={`navbar__logo ${instagramLogoFont.className}`} style={{ padding: '0.5rem 0', margin: '0' }}>Instagram</p>
             </Typography>
 
             <List
@@ -112,68 +107,64 @@ const Navbar = (props) => {
 
     return (
         <>
-        <Box
-            component="nav"
-            sx={{ width: { md: props.drawerWidth }, flexShrink: { md: 0 }, height: '100vh' }}
-            aria-label="mailbox folders"
-        >
-            <Drawer
-                variant="permanent"
-                sx={{
-                    display: { sm: 'none', md: 'block', xs: 'none' },
-                    '& .MuiDrawer-paper': {
-                        boxSizing: 'border-box', width: props.drawerWidth, color: 'white', backgroundColor: 'black', height: '100vh',
-                        borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-
-                    },
-                }}
-                open
+            <Box
+                component="nav"
+                sx={{ width: { md: props.drawerWidth }, flexShrink: { md: 0 }, height: '100vh' }}
+                aria-label="mailbox folders"
             >
-                {drawer}
-            </Drawer>
+                <Drawer
+                    variant="permanent"
+                    sx={{
+                        display: { sm: 'none', md: 'block', xs: 'none' },
+                        '& .MuiDrawer-paper': {
+                            boxSizing: 'border-box', width: props.drawerWidth, color: 'white', backgroundColor: 'black', height: '100vh',
+                            borderRight: '1px solid rgba(255, 255, 255, 0.1)',
 
-
-
-        </Box>
-
-        <Box ref={ref}
-
-             display={{ xs: 'block', sm: 'block', md: 'none' }}
-             >
-                      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, 
-
-                    }} elevation={3}>
-            <BottomNavigation
-
-            sx={
-                { backgroundColor: 'black',
-            }
-                
-            } 
-            // showLabels
-            //     value={value}
-                //   onChange={(event, newValue) => {
-                //     setValue(newValue);
-                //   }}
+                        },
+                    }}
+                    open
                 >
-                {/* <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
+                    {drawer}
+                </Drawer>
+            </Box>
+
+            <Box ref={ref}
+                display={{ xs: 'block', sm: 'block', md: 'none' }}
+            >
+                <Paper sx={{
+                    position: 'fixed', bottom: 0, left: 0, right: 0,
+
+                }} elevation={3}>
+                    <BottomNavigation
+                        sx={
+                            {
+                                backgroundColor: 'black',
+                            }
+
+                        }
+                    // showLabels
+                    //     value={value}
+                    //   onChange={(event, newValue) => {
+                    //     setValue(newValue);
+                    //   }}
+                    >
+                        {/* <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
                 <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
                 <BottomNavigationAction label="Archive" icon={<ArchiveIcon />} /> */}
 
-                {
-                    Object.entries(TopNavComponents).map(([text, Icon]) => (
-                        <BottomNavigationAction key={text} label={text} icon={<Icon />}
-                                sx={{ color: 'white' }}
-                        />
-                    ))
-                }
-            </BottomNavigation>
-        </Paper>
-        </Box>
-
+                        {
+                            Object.entries(TopNavComponents).map(([text, Icon]) => (
+                                <BottomNavigationAction key={text} label={text} icon={<Icon />}
+                                    sx={{ color: 'white' }}
+                                />
+                            ))
+                        }
+                    </BottomNavigation>
+                </Paper>
+            </Box>
         </>
 
-        
+
     )
 }
 
