@@ -42,7 +42,7 @@ const Stories = () => {
           whiteSpace: 'nowrap',
           padding: '0',
           margin: { sm: '0', md: '0 10rem' },
-          py: 1,
+          p: 1,
           // backgroundColor: 'white',
           userSelect: 'none',
           
