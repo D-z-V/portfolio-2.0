@@ -34,7 +34,7 @@ const Appbar = () => {
             className={`navbar__logo ${instagramLogoFont.className}`}
             style={{ padding: '0.5rem 0', margin: '0' }}
           >
-            Instagram
+            Portfolio
           </p>
         </Typography>
         <div>

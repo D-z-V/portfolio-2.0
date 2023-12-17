@@ -8,7 +8,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 import dynamicStory from './dynamicStory.gif';
 import staticStory from './staticStory.png';
 
-import nextJS from './Nextjs-logo.svg';
 
 const Stories = () => {
   const [activeIndex, setActiveIndex] = React.useState(null);
@@ -58,7 +57,7 @@ const Stories = () => {
               justifyContent: 'center',
               padding: '3rem',
               borderRadius: '50%',
-              height: '100px',
+              height: '80px',
               width: '100px',
             }}
           >
