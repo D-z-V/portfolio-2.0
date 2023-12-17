@@ -16,6 +16,8 @@ import { useWindowSize } from "@uidotdev/usehooks";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Divider } from "@mui/material";
 
+import Posts from "@/components/Posts";
+
 
 
 const drawerWidth = 240;
@@ -60,7 +62,7 @@ export default function Home() {
       {   size.width > 900 ? <Navbar drawerWidth={drawerWidth} /> : null   }
 
       { size.width < 900 ? (
-        <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden'  }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden', overflowY: 'scroll'  }}>
 
           <Appbar/>
 
@@ -76,7 +78,10 @@ export default function Home() {
           >
             <Stories />
 
+
             <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+            <Posts />
 
           </Box>
         </Box>

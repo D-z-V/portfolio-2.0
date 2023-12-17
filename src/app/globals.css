@@ -118,3 +118,14 @@ a {
   display: none;
   /* for Chrome, Safari, and Opera */
 }
+
+.heartIcon {
+  fill: red;
+  animation: pulse 0.3s ease-in;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.6); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
