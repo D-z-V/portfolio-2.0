@@ -42,8 +42,12 @@ const Stories = () => {
           whiteSpace: 'nowrap',
           padding: '0',
           margin: { sm: '0', md: '0 10rem' },
+          py: 1,
           // backgroundColor: 'white',
+          userSelect: 'none',
+          
         }}
+        
         className="stories"
       >
         {Object.entries(stories).map(([key, value], index) => (
@@ -64,7 +68,7 @@ const Stories = () => {
 
             {index === activeIndex ? (
               <>
-                <Image src={dynamicStory} alt="dynamic story" width={80} height={80}
+                <Image src={dynamicStory} alt="dynamic story" width={85} height={85}
 
                 />
                 <Box
@@ -73,10 +77,10 @@ const Stories = () => {
                   sx={{
                     backgroundColor: 'white',
                     borderRadius: '50%',
-                    height: '61px',
-                    width: '61px',
+                    height: '65px',
+                    width: '65px',
                     position: 'absolute',
-                    padding: '0.15rem',
+                    padding: '0.25rem',
 
                   }}
                 >
@@ -97,17 +101,17 @@ const Stories = () => {
               </>
             ) : (
               <>
-                <Image src={staticStory} alt="static story" width={80} height={80} />
+                <Image src={staticStory} alt="static story" width={85} height={85} />
                 <Box
 
 
                   sx={{
                     backgroundColor: 'white',
                     borderRadius: '50%',
-                    height: '60px',
-                    width: '60px',
+                    height: '65px',
+                    width: '65px',
                     position: 'absolute',
-                    padding: '0.15rem',
+                    padding: '0.25rem',
                   }}
                 >
                   <Image src={value} alt={key} width={55} height={55}

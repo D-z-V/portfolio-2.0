@@ -14,6 +14,7 @@ import Stories from "@/components/Stories";
 import { useMemo } from "react";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { Divider } from "@mui/material";
 
 
 
@@ -22,22 +23,6 @@ const drawerWidth = 240;
 export default function Home() {
 
   const size = useWindowSize();
-
-  // const [width, setWidth] = React.useState(size.width);
-
-  // React.useEffect(() => {
-  //   setWidth(window.innerWidth);
-
-  //   const handleResize = () => {
-  //     setWidth(window.innerWidth);
-
-  //     // console.log(screen.width);
-  //   };
-  //   window.addEventListener('resize', handleResize);
-  //   return () => {
-  //     window.removeEventListener('resize', handleResize);
-  //   };
-  // }, []);
 
   const theme = useMemo(
     () =>
@@ -84,12 +69,15 @@ export default function Home() {
           <Box
             component="main"
             sx={{
-              flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` },
+              flexGrow: 1, p: 0, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` },
               backgroundColor: 'black',
               color: 'white'
             }}
           >
             <Stories />
+
+            <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+
           </Box>
         </Box>
       ) : (
