@@ -1,8 +1,7 @@
 "use client";
+import localFont from 'next/font/local';
 
-import localFont from 'next/font/local'
-
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -23,20 +22,15 @@ import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Paper from '@mui/material/Paper';
 
-const instagramLogoFont = localFont({ src: '../../fonts/GrandHotel-Regular.ttf' })
+const instagramLogoFont = localFont({ src: '../../fonts/GrandHotel-Regular.ttf' });
 
 const Navbar = (props) => {
+    const [selectedNavIndex, setSelectedNavIndex] = useState('Home');
+    const ref = useRef(null);
 
-    const [value, setValue] = React.useState(0);
-    const ref = React.useRef(null);
-    // const [messages, setMessages] = React.useState(() => refreshMessages());
-
-    const [selectedNavIndex, setSelectedNavIndex] = React.useState('Home');
-
-    React.useEffect(() => {
+    useEffect(() => {
         ref.current.ownerDocument.body.scrollTop = 0;
-        //   setMessages(refreshMessages());
-    }, [value]);
+    }, [selectedNavIndex]);
 
     const TopNavComponents = {
         'Home': HomeIcon,
@@ -51,17 +45,13 @@ const Navbar = (props) => {
         'More': MoreIcon,
     }
 
-
     const drawer = (
         <>
-
             <Typography variant="h4" noWrap component="div" sx={{ display: 'flex', alignItems: 'center', margin: '1.25rem 0 1.75rem 1rem', minHeight: '50px', cursor: 'pointer' }}>
-                <p className={`navbar__logo ${instagramLogoFont.className}`} style={{ padding: '0.5rem 0', margin: '0' }}>Instagram</p>
+                <p className={`navbar__logo ${instagramLogoFont.className}`} style={{ padding: '0.5rem 0', margin: '0' }}>Portfolio</p>
             </Typography>
 
-            <List
-                sx={{ paddingBottom: `calc(100%)`, color: 'white', height: `calc(100vh - 240px)` }}
-            >
+            <List sx={{ paddingBottom: `calc(100%)`, color: 'white', height: `calc(100vh - 240px)` }}>
                 {Object.entries(TopNavComponents).map(([text, Icon]) => (
                     <ListItem key={text} disablePadding>
                         <ListItemButton
@@ -71,11 +61,7 @@ const Navbar = (props) => {
                             }}
                             onClick={() => setSelectedNavIndex(text)}
                         >
-                            {
-
-                                selectedNavIndex === text ? <Icon selected /> : <Icon />
-                            }
-   
+                            {selectedNavIndex === text ? <Icon selected /> : <Icon />}
                             <ListItemText primary={text}
                                 sx={{
                                     marginLeft: '1.25rem',
@@ -94,11 +80,10 @@ const Navbar = (props) => {
                             sx={{
                                 '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }, borderRadius: '12px', padding: '0.5rem',
                                 margin: '0 0.25rem'
-
                             }}
                             onClick={() => setSelectedNavIndex(text)}
                         >
-                            { selectedNavIndex === text ? <Icon selected /> : <Icon /> }
+                            {selectedNavIndex === text ? <Icon selected /> : <Icon />}
                             <ListItemText primary={text}
                                 sx={{
                                     marginLeft: '1.25rem',
@@ -126,7 +111,6 @@ const Navbar = (props) => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box', width: props.drawerWidth, color: 'white', backgroundColor: 'black', height: '100vh',
                             borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-
                         },
                     }}
                     open
@@ -135,49 +119,23 @@ const Navbar = (props) => {
                 </Drawer>
             </Box>
 
-            <Box ref={ref}
-                display={{ xs: 'block', sm: 'block', md: 'none' }}
-            >
-                <Paper sx={{
-                    position: 'fixed', bottom: 0, left: 0, right: 0,
-
-                }} elevation={3}>
-                    <BottomNavigation
-                        sx={
-                            {
-                                backgroundColor: 'black',
-                            }
-
-                        }
-                    // showLabels
-                    //     value={value}
-                    //   onChange={(event, newValue) => {
-                    //     setValue(newValue);
-                    //   }}
-                    >
-                        {/* <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
-                <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
-                <BottomNavigationAction label="Archive" icon={<ArchiveIcon />} /> */}
-
-                        {
-                            Object.entries(TopNavComponents).map(([text, Icon]) => (
-                                <BottomNavigationAction key={text} label={text} icon={selectedNavIndex === text ? <Icon selected /> : <Icon />}
-                                    sx={{ color: 'white',
+            <Box ref={ref} display={{ xs: 'block', sm: 'block', md: 'none' }}>
+                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+                    <BottomNavigation sx={{ backgroundColor: 'black' }}>
+                        {Object.entries(TopNavComponents).map(([text, Icon]) => (
+                            <BottomNavigationAction key={text} label={text} icon={selectedNavIndex === text ? <Icon selected /> : <Icon />}
+                                sx={{
+                                    color: 'white',
                                     paddingX: '0rem',
                                 }}
-
-                                    onClick={() => setSelectedNavIndex(text)}
-                                />
-                            ))
-                        }
+                                onClick={() => setSelectedNavIndex(text)}
+                            />
+                        ))}
                     </BottomNavigation>
                 </Paper>
             </Box>
         </>
-
-
     )
 }
 
 export default Navbar;
-

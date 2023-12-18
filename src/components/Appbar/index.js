@@ -1,3 +1,4 @@
+import React from 'react';
 import localFont from 'next/font/local';
 
 import AppBar from '@mui/material/AppBar';
@@ -9,7 +10,6 @@ import Badge from '@mui/material/Badge';
 import ContactIcon from '@/Icons/ContactIcon';
 import ProfileIcon from '@/Icons/ProfileIcon';
 
-
 const instagramLogoFont = localFont({ src: '../../fonts/GrandHotel-Regular.ttf' });
 
 const Appbar = () => {
@@ -17,8 +17,7 @@ const Appbar = () => {
     <AppBar position="static" sx={{ backgroundColor: 'black' }}>
       <Toolbar sx={{ justifyContent: 'space-between', margin: '0.2rem 0', padding: '0rem 0.5rem',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-    
-    }}>
+      }}>
         <Typography
           variant="h4"
           noWrap
@@ -41,12 +40,12 @@ const Appbar = () => {
         </Typography>
         <div>
           <IconButton size="large" color="inherit" aria-label="menu" >
-            <ProfileIcon height = {27} width = {27}/>
+            <ProfileIcon height={27} width={27} />
           </IconButton>
           <IconButton size="large" color="inherit" aria-label="menu">
-          <Badge badgeContent={1} color="error">
-            <ContactIcon height = {27} width = {27}/>
-          </Badge>
+            <Badge badgeContent={1} color="error">
+              <ContactIcon height={27} width={27} />
+            </Badge>
           </IconButton>
         </div>
       </Toolbar>
