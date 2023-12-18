@@ -8,6 +8,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import dynamicStory from './dynamicStory.gif';
 import staticStory from './staticStory.png';
 
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
 
 const Stories = () => {
   const [activeIndex, setActiveIndex] = React.useState(null);
@@ -42,7 +44,7 @@ const Stories = () => {
           whiteSpace: 'nowrap',
           padding: '0',
           margin: { sm: '0', md: '0 10rem' },
-          p: 1,
+          py: 1,
           // backgroundColor: 'white',
           userSelect: 'none',
           
@@ -50,7 +52,74 @@ const Stories = () => {
         
         className="stories"
       >
+          <Box key="Mext" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <ListItemButton
+            key={"NextJS"}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '3rem',
+              borderRadius: '50%',
+              height: '80px',
+              width: '100px',
+            }}
+          >
+
+              <>
+                {/* <Image src={dynamicStory} alt="dynamic story" width={85} height={85}
+
+                /> */}
+                <Box
+
+
+                  sx={{
+                    backgroundColor: 'white',
+                      borderRadius: '50%',
+                    height: '65px',
+                    width: '65px',
+                    position: 'absolute',
+                    padding: '0.25rem',
+
+                  }}
+                >
+                  <Image src={"https://www.svgrepo.com/show/424916/meta-logo-facebook.svg"} alt={"NextJS"} width={55} height={55}
+                    style={
+                      {
+                        position: 'absolute',
+                        // top: { md: '12%', sm: '10%' },
+                        // left: { md: '19%', sm: '17%' },
+                        zIndex: '1',
+                        clipPath: 'circle(50% at 50% 50%)',
+                      }
+
+                    }
+
+                  />
+
+                  <ChevronRightIcon sx={{color: 'black', 
+                    backgroundColor: '#0093f1',
+                    position: 'absolute',
+                    top: '70%',
+                    left: '70%',
+                    borderRadius: '50%',
+                    border: '2px solid black',
+                    fontSize: '1.55rem',
+                
+                }} />
+
+                </Box>
+              </>
+
+          </ListItemButton>
+          <Typography variant="body2" color="white" textAlign={'center'} sx={{ px: 1, py: 0 }}>
+                      {"My Skills"}
+          </Typography>
+        </Box>
+
         {Object.entries(stories).map(([key, value], index) => (
+          <Box key={index} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <ListItemButton
             key={index}
             onClick={() => handleStoryClick(index)}
@@ -133,6 +202,10 @@ const Stories = () => {
             )}
 
           </ListItemButton>
+                      <Typography variant="body2" color="white" textAlign={'center'} sx={{ px: 1, py: 0 }}>
+                      {key}
+                    </Typography>
+                    </Box>
         ))}
       </Box>
 

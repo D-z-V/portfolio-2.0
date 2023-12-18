@@ -57,7 +57,8 @@ const PostCard = () => {
         >
             <CardHeader
                 avatar={
-                    <Avatar sx={{ bgcolor: red[500], height: 37, width: 37,}} aria-label="recipe">
+                    <Avatar sx={{ bgcolor: red[500], height: 37, width: 37
+                    }} aria-label="recipe">
                         R
                     </Avatar>
                 }
@@ -67,8 +68,8 @@ const PostCard = () => {
                     </IconButton>
                 }
                 title="Shrimp and Chorizo Paella"
-                titleTypographyProps={{fontWeight: 600, variant: 'body2', textAlign: 'left', fontSize: '1rem'}}
-                sx={{ px: 1, py: 2 } }
+                titleTypographyProps={{fontWeight: 500, variant: 'body2', textAlign: 'left', fontSize: '1rem'}}
+                sx={{ px: 1, py: '0.75rem' } }
             />
             <CardMedia
                 component="img"
@@ -86,7 +87,7 @@ const PostCard = () => {
 
                 <Box>
 
-                    <IconButton aria-label="add to favorites" sx={{color: 'white', pl: 0, pr: 1, '&:hover': {color: 'grey'}}} onClick={handleHeartClick} >
+                    <IconButton aria-label="add to favorites" sx={{color: 'white', pl: 0, pr: 1, }} onClick={handleHeartClick} >
                         {heartClicked ? <ProfileIcon clicked height={27} width={27}/> : <ProfileIcon height={27} width={27}/>}
                     </IconButton>
 
@@ -126,7 +127,7 @@ const PostCard = () => {
                             {likes} likes
                         </Typography>
                     <Button
-                        expand={expanded}
+                        expand={expanded.toString()}
                         onClick={handleExpandClick}
                         aria-expanded={expanded}
                         aria-label="show more"

@@ -13,7 +13,7 @@ const instagramLogoFont = localFont({ src: '../../fonts/GrandHotel-Regular.ttf' 
 const Appbar = () => {
   return (
     <AppBar position="static" sx={{ backgroundColor: 'black' }}>
-      <Toolbar sx={{ justifyContent: 'space-between', margin: '0.2rem 0',
+      <Toolbar sx={{ justifyContent: 'space-between', margin: '0.2rem 0', padding: '0rem 0.25rem',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
     
     }}>

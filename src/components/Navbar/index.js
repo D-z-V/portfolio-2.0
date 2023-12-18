@@ -163,7 +163,7 @@ const Navbar = (props) => {
                             Object.entries(TopNavComponents).map(([text, Icon]) => (
                                 <BottomNavigationAction key={text} label={text} icon={selectedNavIndex === text ? <Icon selected /> : <Icon />}
                                     sx={{ color: 'white',
-                                    paddingX: '0.5rem',
+                                    paddingX: '0rem',
                                 }}
 
                                     onClick={() => setSelectedNavIndex(text)}
