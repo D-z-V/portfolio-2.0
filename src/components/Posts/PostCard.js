@@ -26,6 +26,7 @@ const PostCard = (props) => {
     const [heartClicked, setHeartClicked] = React.useState(false);
     const [BookmarkSelected, setBookmarkSelected] = React.useState(false);
     const [mediaDoubleClick, setMediaDoubleClick] = React.useState(false);
+    const [lastTap, setLastTap] = React.useState(0);
     
     const [likes, setLikes] = React.useState(0);
 
@@ -51,6 +52,20 @@ const PostCard = (props) => {
         }, 1000);
     }
     
+    const handleTouchStart = () => {
+        // Handle touch start event (simulate double-tap)
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        
+        if (tapLength < 300 && tapLength > 0) {
+            // Double tap
+            handleCardMediaDoubleClick();
+        } else {
+            // Single tap
+            setLastTap(currentTime);
+        }
+    };
+
     const handleBookmarkClick = () => {
         setBookmarkSelected(!BookmarkSelected);
     }
@@ -79,16 +94,9 @@ const PostCard = (props) => {
                 titleTypographyProps={{fontWeight: 500, variant: 'body2', textAlign: 'left', fontSize: '1rem'}}
                 sx={{ px: 1, py: '0.75rem' } }
             />
-            {props.mobile ?
-            (<CardMedia
-                component="img"
-                sx={{maxHeight: 500, borderRadius: '0.25rem'}}
-                image="https://thepreviewapp.com/wp-content/uploads/2022/01/first-instagram-post-ideas-introduce-business.jpg"
-                alt="Paella dish"
-                onDoubleClick={handleHeartClick}
-            />
-            ) : (
             <Button onDoubleClick={handleCardMediaDoubleClick}
+            onTouchStart={handleTouchStart}
+            onDouble
                 sx={
                     {
                         width: '100%',
@@ -111,16 +119,15 @@ const PostCard = (props) => {
                 <Box
                     position={'absolute'}
                     className={'doubleTapIcon'}
-                        
+                    color={'white'}
                 >
-                <ProfileIcon height={100} width={100}
-                
+                <ProfileIcon height={120} width={120}
+                    selected
                 />
                 </Box>
                 )
             }
             </Button>
-            )}
             <CardContent sx={{ px: 1, py: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 
             >
