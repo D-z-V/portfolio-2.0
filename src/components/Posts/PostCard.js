@@ -27,7 +27,7 @@ const PostCard = (props) => {
     const [BookmarkSelected, setBookmarkSelected] = React.useState(false);
     const [mediaDoubleClick, setMediaDoubleClick] = React.useState(false);
     const [lastTap, setLastTap] = React.useState(0);
-    
+    const [liked, setLiked] = React.useState(false);
     const [likes, setLikes] = React.useState(0);
 
     const handleExpandClick = () => {
@@ -41,11 +41,14 @@ const PostCard = (props) => {
         } else {
             setLikes(likes + 1);
         }
-
+        setLiked(!liked);
         setHeartClicked(!heartClicked);
     }
 
     const handleCardMediaDoubleClick = () => {
+        if (!liked) {
+            handleHeartClick();
+        }
         setMediaDoubleClick(true);
         setTimeout(() => {
             setMediaDoubleClick(false);
