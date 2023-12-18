@@ -64,7 +64,9 @@ const Stories = () => {
               borderRadius: '50%',
               height: '80px',
               width: '100px',
+
             }}
+            className='story'
           >
 
               <>
@@ -80,7 +82,7 @@ const Stories = () => {
                     height: '70px',
                     width: '70px',
                     position: 'absolute',
-                    padding: '0.2rem',
+                    padding: '0.15rem',
 
                   }}
                 >
@@ -135,6 +137,7 @@ const Stories = () => {
               height: '80px',
               width: '100px',
             }}
+            className='story'
           >
 
             {index === activeIndex ? (
