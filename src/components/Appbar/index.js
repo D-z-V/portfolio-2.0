@@ -4,9 +4,11 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import Badge from '@mui/material/Badge';
 
 import ContactIcon from '@/Icons/ContactIcon';
 import ProfileIcon from '@/Icons/ProfileIcon';
+
 
 const instagramLogoFont = localFont({ src: '../../fonts/GrandHotel-Regular.ttf' });
 
@@ -42,7 +44,9 @@ const Appbar = () => {
             <ProfileIcon height = {27} width = {27}/>
           </IconButton>
           <IconButton size="large" color="inherit" aria-label="menu">
+          <Badge badgeContent={1} color="error">
             <ContactIcon height = {27} width = {27}/>
+          </Badge>
           </IconButton>
         </div>
       </Toolbar>
