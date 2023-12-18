@@ -29,6 +29,9 @@ const Stories = () => {
     'Keras': 'https://upload.wikimedia.org/wikipedia/commons/a/ae/Keras_logo.svg',
     'SQL': 'https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg',
     'Flask': 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Flask_logo.svg',
+    'Git': 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Git_icon.svg',
+    'Github': 'https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg',
+    'Heroku': 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Heroku_logo.svg',
   }
 
   return (

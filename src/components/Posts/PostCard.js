@@ -20,12 +20,13 @@ import BookmarkIcon from '@/Icons/BookmarkIcon';
 
 
 
-const PostCard = () => {
+const PostCard = (props) => {
     const [expanded, setExpanded] = React.useState(false);
 
     const [heartClicked, setHeartClicked] = React.useState(false);
     const [BookmarkSelected, setBookmarkSelected] = React.useState(false);
-
+    const [mediaDoubleClick, setMediaDoubleClick] = React.useState(false);
+    
     const [likes, setLikes] = React.useState(0);
 
     const handleExpandClick = () => {
@@ -42,6 +43,13 @@ const PostCard = () => {
 
         setHeartClicked(!heartClicked);
     }
+
+    const handleCardMediaDoubleClick = () => {
+        setMediaDoubleClick(true);
+        setTimeout(() => {
+            setMediaDoubleClick(false);
+        }, 1000);
+    }
     
     const handleBookmarkClick = () => {
         setBookmarkSelected(!BookmarkSelected);
@@ -49,7 +57,7 @@ const PostCard = () => {
 
     return (
         <Card sx={{
-            maxWidth: 900,
+            maxWidth: 550,
             backgroundColor: 'black',
             color: 'white',
         }}
@@ -71,16 +79,48 @@ const PostCard = () => {
                 titleTypographyProps={{fontWeight: 500, variant: 'body2', textAlign: 'left', fontSize: '1rem'}}
                 sx={{ px: 1, py: '0.75rem' } }
             />
-            <CardMedia
+            {props.mobile ?
+            (<CardMedia
                 component="img"
-                sx={
-                    {
-                        maxHeight: 500,
-                    }
-                }
+                sx={{maxHeight: 500, borderRadius: '0.25rem'}}
                 image="https://thepreviewapp.com/wp-content/uploads/2022/01/first-instagram-post-ideas-introduce-business.jpg"
                 alt="Paella dish"
+                onDoubleClick={handleHeartClick}
             />
+            ) : (
+            <Button onDoubleClick={handleCardMediaDoubleClick}
+                sx={
+                    {
+                        width: '100%',
+                        p: 0
+                    }
+                }
+                disableFocusRipple={true}
+                disableRipple={true}
+                disableTouchRipple={true}
+            >
+            <CardMedia
+                component="img"
+                sx={{maxHeight: 500 }}
+                image="https://thepreviewapp.com/wp-content/uploads/2022/01/first-instagram-post-ideas-introduce-business.jpg"
+                alt="Paella dish"
+
+            />
+            {
+                mediaDoubleClick && (
+                <Box
+                    position={'absolute'}
+                    className={'doubleTapIcon'}
+                        
+                >
+                <ProfileIcon height={100} width={100}
+                
+                />
+                </Box>
+                )
+            }
+            </Button>
+            )}
             <CardContent sx={{ px: 1, py: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 
             >

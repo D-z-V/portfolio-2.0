@@ -136,6 +136,11 @@ a {
 
 img {
   pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 @keyframes pulse {
@@ -146,4 +151,23 @@ img {
 
 .MuiCardHeader-avatar {
   margin-right: 7px !important;
+}
+
+.doubleTapIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  animation: doubleTap 1s ease-in-out;
+  opacity: 0;
+}
+
+@keyframes doubleTap {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 100; }
+  /* 50% { transform: translate(-50%, -50%) scale(1); } */
+  50% { transform: translate(-50%, -50%) scale(1.2);  opacity: 100; }
+  70% { transform: translate(-50%, -50%) scale(1);  opacity: 100; }
+  /* 80% { transform: translate(-50%, -50%) scale(1.3);  opacity: 100; } */
+  80% { transform: translate(-50%, -50%) scale(1);  opacity: 100; }
+  100% { transform: translate(-50%, -50%) scale(0);  opacity: 0; }
 }

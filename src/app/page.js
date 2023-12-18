@@ -59,48 +59,30 @@ export default function Home() {
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <ThemeProvider theme={theme}>
       <CssBaseline/>
-      {   size.width > 900 ? <Navbar drawerWidth={drawerWidth} /> : null   }
+      {size.width > 900 ? <Navbar drawerWidth={drawerWidth} /> : null}
 
       { size.width < 900 ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden', overflowY: 'scroll'  }}>
-
           <Appbar/>
-
-
-
           <Box
             component="main"
-            sx={{
-              flexGrow: 1, p: 0, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` },
-              backgroundColor: 'black',
-              color: 'white'
-            }}
+            sx={{flexGrow: 1, p: 0, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black',color: 'white'}}
           >
             <Stories />
-
-
             <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
-
             <Posts />
-
           </Box>
         </Box>
       ) : (
         <Box
           component="main"
-          sx={{
-            flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` },
-            backgroundColor: 'black',
-            color: 'white'
-          }}
-        >
-
+          sx={{flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` },backgroundColor: 'black',color: 'white'}}>
           <Stories />
-
+          <Posts mobile />
         </Box>
         )}
 
-      {   size.width < 900 ? <Navbar drawerWidth={drawerWidth} /> : null  }
+      {size.width < 900 ? <Navbar drawerWidth={drawerWidth} /> : null}
           </ThemeProvider>
     </Box>
   )

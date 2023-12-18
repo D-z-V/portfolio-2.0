@@ -1,7 +1,7 @@
 import PostCard from '@/components/Posts/PostCard';
 import Box from '@mui/material/Box';
 
-const Posts = () => {
+const Posts = (props) => {
     return (
         <Box
         sx={{
@@ -13,8 +13,8 @@ const Posts = () => {
             pb: '3rem',
         }}
         >
-        <PostCard />
-        <PostCard />
+        <PostCard {...props} />
+        <PostCard {...props} />
         </Box>
     );
     }
