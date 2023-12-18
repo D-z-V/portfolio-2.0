@@ -77,35 +77,37 @@ const Stories = () => {
                   sx={{
                     backgroundColor: 'white',
                       borderRadius: '50%',
-                    height: '65px',
-                    width: '65px',
+                    height: '70px',
+                    width: '70px',
                     position: 'absolute',
-                    padding: '0.25rem',
+                    padding: '0.2rem',
 
                   }}
                 >
-                  <Image src={"https://www.svgrepo.com/show/424916/meta-logo-facebook.svg"} alt={"NextJS"} width={55} height={55}
+                  <Image src={"https://www.svgrepo.com/show/424916/meta-logo-facebook.svg"} alt={"NextJS"} width={65} height={65}
                     style={
                       {
                         position: 'absolute',
                         // top: { md: '12%', sm: '10%' },
                         // left: { md: '19%', sm: '17%' },
-                        zIndex: '1',
+                        zIndex: '0',
                         clipPath: 'circle(50% at 50% 50%)',
+                        
                       }
 
                     }
 
                   />
 
-                  <ChevronRightIcon sx={{color: 'black', 
+                  <ChevronRightIcon sx={{color: 'white',
                     backgroundColor: '#0093f1',
                     position: 'absolute',
-                    top: '70%',
-                    left: '70%',
+                    top: '68%',
+                    left: '68%',
                     borderRadius: '50%',
                     border: '2px solid black',
-                    fontSize: '1.55rem',
+                    fontSize: '1.65rem',
+
                 
                 }} />
 
