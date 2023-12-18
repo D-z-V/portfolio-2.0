@@ -124,7 +124,7 @@ a {
   animation: pulse 0.3s ease-in;
 }
 
-.story:hover{
+/* .story:hover{
   animation: hoveron 0.2s ease;
   transform: scale(0.9);
 }
@@ -132,6 +132,10 @@ a {
 @keyframes hoveron {
   0% { transform: scale(1); }
   100% { transform: scale(0.9); }
+} */
+
+img {
+  pointer-events: none;
 }
 
 @keyframes pulse {
