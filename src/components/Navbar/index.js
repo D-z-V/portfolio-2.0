@@ -1,5 +1,6 @@
 "use client";
 import localFont from 'next/font/local';
+import Link from "next/link";
 
 import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
@@ -35,7 +36,7 @@ const Navbar = (props) => {
     const TopNavComponents = {
         'Home': HomeIcon,
         'Explore': ExploreIcon,
-        'Projects': ProjectIcon,
+        'reels': ProjectIcon,
         'Profile': ProfileIcon,
         'Blog': BlogIcon,
     }
@@ -120,16 +121,18 @@ const Navbar = (props) => {
             </Box>
 
             <Box ref={ref} display={{ xs: 'block', sm: 'block', md: 'none' }}>
-                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 2 }} elevation={3}>
                     <BottomNavigation sx={{ backgroundColor: 'black' }}>
                         {Object.entries(TopNavComponents).map(([text, Icon]) => (
-                            <BottomNavigationAction key={text} label={text} icon={selectedNavIndex === text ? <Icon selected /> : <Icon />}
-                                sx={{
-                                    color: 'white',
-                                    paddingX: '0rem',
-                                }}
-                                onClick={() => setSelectedNavIndex(text)}
-                            />
+                            <Link href={text == 'Home' ? '/' : `/${text.toLowerCase()}`} key={text}>
+                                <BottomNavigationAction key={text} label={text} icon={selectedNavIndex === text ? <Icon selected /> : <Icon />}
+                                    sx={{
+                                        color: 'white',
+                                        paddingX: '0rem',
+                                    }}
+                                    onClick={() => setSelectedNavIndex(text)}
+                                />
+                            </Link>
                         ))}
                     </BottomNavigation>
                 </Paper>
