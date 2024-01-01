@@ -47,18 +47,24 @@ const reels = () => {
         []
     );
 
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Box sx={{ scrollSnapType: "y mandatory" }}>
+                <Box sx={{ scrollSnapAlign: "start" }}>
+                    <Reel />
+                </Box>
+                <Box sx={{ scrollSnapAlign: "start" }}>
+                    <Reel />
+                </Box>
+                <Box sx={{ scrollSnapAlign: "start" }}>
+                    <Reel />
+                </Box>
+            </Box>
 
-
-return (
-    <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', pb: '3rem',}}>
-    <Reel />
-    <Reel />
-    </Box>
-
-    <Navbar />  
-    </ThemeProvider>
-);}
+            <Navbar />
+        </ThemeProvider>
+    );
+}
 
 export default reels;

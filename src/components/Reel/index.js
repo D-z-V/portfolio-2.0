@@ -93,7 +93,7 @@ const Reel = () => {
         <>
             {/* <ThemeProvider theme={theme}>
                 <CssBaseline /> */}
-                <Card sx={{ width: "100%", height: { sm: "calc(100vh - 3rem)", md: "100vh"}, backgroundColor: "black", color: "white", maxWidth: 500, margin: "auto" , position: "relative" }}>
+                <Card sx={{ width: "100%", backgroundColor: "black", color: "white", maxWidth: 500, margin: "auto" , position: "relative", height: { xs: "calc(100vh - 3rem)" ,sm: "calc(100vh - 3rem)", md: "100vh"} }}>
 
 
                         <img
@@ -104,7 +104,7 @@ const Reel = () => {
 
                     <Box sx={{ maxWidth: 500, position: "absolute", top: "10%", left: "0", right: "0", bottom: "0", margin: "auto", zIndex: "1" }}>
 
-                <Button onDoubleClick={handleCardMediaDoubleClick} onTouchStart={handleTouchStart} sx={{ width: '90%', height: "80%", p: 0 }} disableFocusRipple={true} disableRipple={true} disableTouchRipple={true}>   
+                    <Button onDoubleClick={handleCardMediaDoubleClick} onTouchStart={handleTouchStart} sx={{ width: '90%', height: "80%", p: 0 }} disableFocusRipple={true} disableRipple={true} disableTouchRipple={true}>   
 
 
 
