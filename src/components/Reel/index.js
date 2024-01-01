@@ -94,13 +94,13 @@ const Reel = (props) => {
         <>
             {/* <ThemeProvider theme={theme}>
                 <CssBaseline /> */}
-                <Card sx={{ width: "100%", backgroundColor: "black", color: "white", maxWidth: 500, margin: "auto" , position: "relative", height: { xs: "calc(100dvh - 3rem)" ,sm: "calc(100dvh - 3rem)", md: "100vh"} }}>
+                <Card sx={{ width: "100%", backgroundColor: "black", color: "white", maxWidth: 500, margin: "auto" , position: "relative", height: { xs: "calc(100vh - 3rem)" ,sm: "calc(100vh - 3rem)", md: "100vh"} }}>
 
 
                         <img
                             src={props.reelLink}
                             alt={props.userName}
-                            style={{ width: "100%", height: "100dvh", objectFit: "contain", objectPosition: "center" }}
+                            style={{ width: "100%", height: "100vh", objectFit: "contain", objectPosition: "center" }}
                         />
                     <Box sx={{ maxWidth: 500, position: "absolute", top: "7%", left: "0", right: "0", bottom: "0", margin: "auto", zIndex: "1" }}>
 
@@ -108,7 +108,7 @@ const Reel = (props) => {
                     </Box>
                         <Box sx={{ maxWidth: 500, position: "absolute", top: "0", left: "0", right: "0", bottom: "0", margin: "auto" }}>
 
-                            <Box sx={{ color: "white", position: "absolute", top: "3%", left: "2%", width: "75%", display: "flex"}}>
+                            <Box sx={{ color: "white", position: "absolute", top: "2%", left: "3%", width: "75%", display: "flex"}}>
                                 <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: 600 }}>
                                     Reels
                                 </Typography>
@@ -118,7 +118,7 @@ const Reel = (props) => {
                             </Box>
 
 
-                            <Box sx={{ color: "white", position: "absolute", top: "80%", left: "2%", width: "75%" }}>
+                            <Box sx={{ color: "white", position: "absolute", top: "80%", left: "3%", width: "75%" }}>
                                 <Typography gutterBottom variant="h6" component="div" display={"flex"} alignItems={"center"}>
 
                                     <Avatar sx={{ height: 47, width: 47, marginRight: "0.5rem", padding: "0.4rem" }} src={props.profilePic} alt={props.userName} />
