@@ -94,13 +94,13 @@ const Reel = (props) => {
         <>
             {/* <ThemeProvider theme={theme}>
                 <CssBaseline /> */}
-                <Card sx={{ width: "100%", backgroundColor: "black", color: "white", maxWidth: 500, margin: "auto" , position: "relative", height: { xs: "calc(100vh - 3rem)" ,sm: "calc(100vh - 3rem)", md: "100vh"} }}>
+                <Card sx={{ width: "100%", backgroundColor: "black", color: "white", maxWidth: 500, margin: "auto" , position: "relative", height: { xs: "calc(100dvh - 3rem)" ,sm: "calc(100dvh - 3rem)", md: "100vh"} }}>
 
 
                         <img
                             src={props.reelLink}
                             alt={props.userName}
-                            style={{ width: "100%", height: "100vh", objectFit: "contain", objectPosition: "center" }}
+                            style={{ width: "100%", height: "100dvh", objectFit: "contain", objectPosition: "center" }}
                         />
                     <Box sx={{ maxWidth: 500, position: "absolute", top: "7%", left: "0", right: "0", bottom: "0", margin: "auto", zIndex: "1" }}>
 
