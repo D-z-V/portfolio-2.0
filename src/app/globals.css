@@ -210,9 +210,9 @@ img {
   left: 0;
   width: inherit;
   height: inherit;
-  background-size: 100% 85%;
+  background-size: 100% 85svh;
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: 20% 20%;
 }
 
 

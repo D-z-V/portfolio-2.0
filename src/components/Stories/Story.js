@@ -13,9 +13,6 @@ const Story = (props) => {
         100% { top: 0; left: 0; height: 100vh; width: 100vw; background-size: 100%; }
     `;
 
-    
-
-
     if (props.clicked) {
         setTimeout(() => {
             setAnimation([0, 0]);
