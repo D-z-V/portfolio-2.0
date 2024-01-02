@@ -187,7 +187,7 @@ const Story = (props) => {
                     zIndex: '9999',
                     display: props.clicked ? 'block' : 'none',
                     animation: `${storyAnimation} ${animationTime}s ease-in`,
-
+                    boxSizing: 'border-box',
                 }}
                 className= "scene"
             >
