@@ -34,16 +34,16 @@ const Navbar = (props) => {
     }, [selectedNavIndex]);
 
     const TopNavComponents = {
-        'Home': HomeIcon,
-        'Explore': ExploreIcon,
+        'home': HomeIcon,
+        'explore': ExploreIcon,
         'reels': ProjectIcon,
-        'Profile': ProfileIcon,
-        'Blog': BlogIcon,
+        'profile': ProfileIcon,
+        'blog': BlogIcon,
     }
 
     const BottomNavComponents = {
-        'Contact': ContactIcon,
-        'More': MoreIcon,
+        'contact': ContactIcon,
+        'more': MoreIcon,
     }
 
     const drawer = (
@@ -54,23 +54,25 @@ const Navbar = (props) => {
 
             <List sx={{ paddingBottom: `calc(100%)`, color: 'white', height: `calc(100vh - 240px)` }}>
                 {Object.entries(TopNavComponents).map(([text, Icon]) => (
-                    <ListItem key={text} disablePadding>
-                        <ListItemButton
-                            sx={{
-                                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }, borderRadius: '12px', padding: '0.5rem',
-                                margin: '0 0.25rem'
-                            }}
-                            onClick={() => setSelectedNavIndex(text)}
-                        >
-                            {selectedNavIndex === text ? <Icon selected /> : <Icon />}
-                            <ListItemText primary={text}
+                    <Link href={text == 'Home' ? '/' : `/${text.toLowerCase()}`} key={text}>
+                        <ListItem key={text} disablePadding>
+                            <ListItemButton
                                 sx={{
-                                    marginLeft: '1.25rem',
-                                    '& .MuiListItemText-primary': { fontSize: '1.15rem' }
+                                    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }, borderRadius: '12px', padding: '0.5rem',
+                                    margin: '0 0.25rem'
                                 }}
-                            />
-                        </ListItemButton>
-                    </ListItem>
+                                onClick={() => setSelectedNavIndex(text)}
+                            >
+                                {selectedNavIndex === text ? <Icon selected /> : <Icon />}
+                                <ListItemText primary={text.charAt(0).toUpperCase() + text.slice(1)}
+                                    sx={{
+                                        marginLeft: '1.25rem',
+                                        '& .MuiListItemText-primary': { fontSize: '1.15rem' }
+                                    }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
                 ))}
             </List>
 
@@ -85,7 +87,7 @@ const Navbar = (props) => {
                             onClick={() => setSelectedNavIndex(text)}
                         >
                             {selectedNavIndex === text ? <Icon selected /> : <Icon />}
-                            <ListItemText primary={text}
+                            <ListItemText primary={text.charAt(0).toUpperCase() + text.slice(1)}
                                 sx={{
                                     marginLeft: '1.25rem',
                                     '& .MuiListItemText-primary': { fontSize: '1.15rem' }

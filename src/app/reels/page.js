@@ -53,7 +53,7 @@ const reels = () => {
 
             <Box sx={{ scrollSnapType: "y mandatory" }}>
                 <Box sx={{ scrollSnapAlign: "start" }}>
-                    <Reel  reelLink = "https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName = "Cyberpunk II" profilePic = "https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
+                    <Reel start reelLink = "https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName = "Cyberpunk II" profilePic = "https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
                 </Box>
                 <Box sx={{ scrollSnapAlign: "start" }}>
                     <Reel reelLink = "https://i.ibb.co/X5mFqVj/giphy-1.gif" userName = "Nyan Cat" profilePic = "https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />

@@ -173,3 +173,57 @@ img {
   100% { transform: translate(-50%, -50%) scale(0);  opacity: 0; }
 }
 
+/* .story {
+  animation: story 0.5s ease-in;
+}
+
+/* make top = 0, left = 0 and height and width full screen  */
+
+/* @keyframes story {
+  0% { height: 0; width: 0;}
+  100% { top: 0; left: 0; height: 100vh; width: 100vw; 
+  }
+} */ 
+
+.scene {
+  perspective: 300vw;
+  width: 100vw;
+  --rotatePercent: 0;
+  position: absolute;
+}
+
+.cube {
+  position: relative;
+  width: inherit;
+  height: inherit;
+  transform-style: preserve-3d;
+  transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
+}
+
+.cube.transition {
+  transition: transform .25s;
+}
+
+.face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  background-size: 100% 85%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+
+.face-left {
+  transform: rotateY(0deg) translateZ(50vw);
+}
+
+.face-front {
+  transform: rotateY(90deg) translateZ(50vw);
+}
+
+.face-right {
+  transform: rotateY(180deg) translateZ(50vw);
+}

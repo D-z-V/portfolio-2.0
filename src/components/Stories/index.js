@@ -10,14 +10,16 @@ import staticStory from './staticStory.png';
 
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
+import Story from '@/components/Stories/Story';
 
 const Stories = () => {
   const [activeIndex, setActiveIndex] = React.useState(null);
+  const [iconPosition, setIconPosition] = React.useState({ top: 0, left: 0 });
 
-  const handleStoryClick = (index) => {
+  const handleStoryClick = (index, position) => {
     setActiveIndex(index);
+    setIconPosition(position);
   };
-
 
   const stories = {
     'NextJS': 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg',
@@ -50,12 +52,10 @@ const Stories = () => {
           pb: 1,
           // backgroundColor: 'white',
           userSelect: 'none',
-          
         }}
-        
         className="stories"
       >
-          <Box key="Mext" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <Box key="Mext" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <ListItemButton
             key={"NextJS"}
             sx={{
@@ -67,44 +67,37 @@ const Stories = () => {
               borderRadius: '50%',
               height: '80px',
               width: '100px',
-
             }}
             className='story'
           >
-
-              <>
-                {/* <Image src={dynamicStory} alt="dynamic story" width={85} height={85}
-
-                /> */}
-                <Box
-
-
-                  sx={{
-                    backgroundColor: 'white',
-                      borderRadius: '50%',
-                    height: '70px',
-                    width: '70px',
+            <>
+              {/* <Image src={dynamicStory} alt="dynamic story" width={85} height={85} /> */}
+              <Box
+                sx={{
+                  backgroundColor: 'white',
+                  borderRadius: '50%',
+                  height: '70px',
+                  width: '70px',
+                  position: 'absolute',
+                  padding: '0.15rem',
+                }}
+              >
+                <Image
+                  src={"https://www.svgrepo.com/show/424916/meta-logo-facebook.svg"}
+                  alt={"NextJS"}
+                  width={65}
+                  height={65}
+                  style={{
                     position: 'absolute',
-                    padding: '0.15rem',
-
+                    // top: { md: '12%', sm: '10%' },
+                    // left: { md: '19%', sm: '17%' },
+                    zIndex: '0',
+                    clipPath: 'circle(50% at 50% 50%)',
                   }}
-                >
-                  <Image src={"https://www.svgrepo.com/show/424916/meta-logo-facebook.svg"} alt={"NextJS"} width={65} height={65}
-                    style={
-                      {
-                        position: 'absolute',
-                        // top: { md: '12%', sm: '10%' },
-                        // left: { md: '19%', sm: '17%' },
-                        zIndex: '0',
-                        clipPath: 'circle(50% at 50% 50%)',
-                        
-                      }
-
-                    }
-
-                  />
-
-                  <ChevronRightIcon sx={{color: 'white',
+                />
+                <ChevronRightIcon
+                  sx={{
+                    color: 'white',
                     backgroundColor: '#0093f1',
                     position: 'absolute',
                     top: '68%',
@@ -112,111 +105,106 @@ const Stories = () => {
                     borderRadius: '50%',
                     border: '2px solid black',
                     fontSize: '1.65rem',
-
-                
-                }} />
-
-                </Box>
-              </>
-
+                  }}
+                />
+              </Box>
+            </>
           </ListItemButton>
           <Typography variant="body2" color="white" textAlign={'center'} sx={{ px: 1, py: 0 }}>
-                      {"My Skills"}
+            {"My Skills"}
           </Typography>
         </Box>
 
         {Object.entries(stories).map(([key, value], index) => (
           <Box key={index} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <ListItemButton
-            key={index}
-            onClick={() => handleStoryClick(index)}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '3rem',
-              borderRadius: '50%',
-              height: '80px',
-              width: '100px',
-            }}
-            className='story'
-          >
-
-            {index === activeIndex ? (
-              <>
-                <Image src={dynamicStory} alt="dynamic story" width={85} height={85}
-
-                />
-                <Box
-
-
-                  sx={{
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    height: '65px',
-                    width: '65px',
-                    position: 'absolute',
-                    padding: '0.25rem',
-
-                  }}
-                >
-                  <Image src={value} alt={key} width={55} height={55}
-                    style={
-                      {
+            <ListItemButton
+              key={index}
+              onClick={(event) => {
+                const rect = event.currentTarget.getBoundingClientRect();
+                const position = {
+                  top: rect.top + window.scrollY,
+                  left: rect.left + window.scrollX,
+                };
+                handleStoryClick(index, position);
+              }}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '3rem',
+                borderRadius: '50%',
+                height: '80px',
+                width: '100px',
+              }}
+              className='story'
+            >
+              {index === activeIndex ? (
+                <>
+                  <Image src={dynamicStory} alt="dynamic story" width={85} height={85} />
+                  <Box
+                    sx={{
+                      backgroundColor: 'white',
+                      borderRadius: '50%',
+                      height: '65px',
+                      width: '65px',
+                      position: 'absolute',
+                      padding: '0.25rem',
+                    }}
+                  >
+                    <Image
+                      src={value}
+                      alt={key}
+                      width={55}
+                      height={55}
+                      style={{
                         position: 'absolute',
                         // top: { md: '12%', sm: '10%' },
                         // left: { md: '19%', sm: '17%' },
                         zIndex: '1',
                         clipPath: 'circle(50% at 50% 50%)',
-                      }
-
-                    }
-
-                  />
-                </Box>
-              </>
-            ) : (
-              <>
-                <Image src={staticStory} alt="static story" width={85} height={85} />
-                <Box
-
-
-                  sx={{
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    height: '65px',
-                    width: '65px',
-                    position: 'absolute',
-                    padding: '0.25rem',
-                  }}
-                >
-                  <Image src={value} alt={key} width={55} height={55}
-                    style={
-                      {
+                      }}
+                    />
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <Image src={staticStory} alt="static story" width={85} height={85} />
+                  <Box
+                    sx={{
+                      backgroundColor: 'white',
+                      borderRadius: '50%',
+                      height: '65px',
+                      width: '65px',
+                      position: 'absolute',
+                      padding: '0.25rem',
+                    }}
+                  >
+                    <Image
+                      src={value}
+                      alt={key}
+                      width={55}
+                      height={55}
+                      style={{
                         position: 'absolute',
                         // top: { md: '12%', sm: '10%' },
                         // left: { md: '19%', sm: '17%' },
                         zIndex: '1',
                         clipPath: 'circle(50% at 50% 50%)',
-                      }
-
-                    }
-
-                  />
-                </Box>
-
-              </>
-            )}
-
-          </ListItemButton>
-                      <Typography variant="body2" color="white" textAlign={'center'} sx={{ px: 1, py: 0 }}>
-                      {key}
-                    </Typography>
-                    </Box>
+                      }}
+                    />
+                  </Box>
+                </>
+              )}
+            </ListItemButton>
+            <Typography variant="body2" color="white" textAlign={'center'} sx={{ px: 1, py: 0 }}>
+              {key}
+            </Typography>
+          </Box>
         ))}
       </Box>
 
+      {activeIndex !== null && <Story top={iconPosition.top} left={iconPosition.left} clicked/>}
     </>
   );
 };

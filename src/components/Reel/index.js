@@ -94,20 +94,22 @@ const Reel = (props) => {
         <>
             {/* <ThemeProvider theme={theme}>
                 <CssBaseline /> */}
-                <Card sx={{ width: "100%", backgroundColor: "black", color: "white", maxWidth: 500, margin: "auto" , position: "relative", height: { xs: "calc(100vh - 3rem)" ,sm: "calc(100vh - 3rem)", md: "100vh"} }}>
+                <Card sx={{ width: "100%", backgroundColor: "black", color: "white", maxWidth: 500, margin: "auto" , position: "relative", height: { xs: "calc(100dvh - 3rem)" ,sm: "calc(100dvh - 3rem)", md: "100dvh"} }}>
 
 
                         <img
                             src={props.reelLink}
                             alt={props.userName}
-                            style={{ width: "100%", height: "100vh", objectFit: "contain", objectPosition: "center" }}
+                            style={{ width: "100%", height: "100dvh", objectFit: "contain", objectPosition: "center" }}
                         />
                     <Box sx={{ maxWidth: 500, position: "absolute", top: "7%", left: "0", right: "0", bottom: "0", margin: "auto", zIndex: "1" }}>
 
                     <Button onDoubleClick={handleCardMediaDoubleClick} onTouchStart={handleTouchStart} sx={{ width: '88%', height: "77%", p: 0 }} disableFocusRipple={true} disableRipple={true} disableTouchRipple={true}>   </Button>
                     </Box>
-                        <Box sx={{ maxWidth: 500, position: "absolute", top: "0", left: "0", right: "0", bottom: "0", margin: "auto" }}>
 
+ 
+                            <Box sx={{ maxWidth: 500, position: "absolute", top: "0", left: "0", right: "0", bottom: "0", margin: "auto" }}>
+                            {props.start && (
                             <Box sx={{ color: "white", position: "absolute", top: "2%", left: "3%", width: "75%", display: "flex"}}>
                                 <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: 600 }}>
                                     Reels
@@ -116,9 +118,12 @@ const Reel = (props) => {
 
        
                             </Box>
+                            )}
+
+                        
 
 
-                            <Box sx={{ color: "white", position: "absolute", top: "80%", left: "3%", width: "75%" }}>
+                            <Box sx={{ color: "white", position: "absolute", bottom: "5%", left: "3%", width: "75%" }}>
                                 <Typography gutterBottom variant="h6" component="div" display={"flex"} alignItems={"center"}>
 
                                     <Avatar sx={{ height: 47, width: 47, marginRight: "0.5rem", padding: "0.4rem" }} src={props.profilePic} alt={props.userName} />
@@ -145,29 +150,29 @@ const Reel = (props) => {
                                     </Typography>
                                 </Button>
                             </Box>
-                            <Box sx={{ color: "white", position: "absolute", top: "62%", right: "3%", display: "flex", flexDirection: "column",  zIndex: "1"  }}>
+                            <Box sx={{ color: "white", position: "absolute", bottom: "2%", right: "3%", display: "flex", flexDirection: "column",  zIndex: "1"  }}>
                                 <IconButton aria-label="add to favorites" sx={{ color: 'white' }} onClick={handleHeartClick}>
-                                    {heartClicked ? <ProfileIcon clicked height={35} width={35} /> : <ProfileIcon height={35} width={35} />}
+                                    {heartClicked ? <ProfileIcon clicked height={32} width={32} /> : <ProfileIcon height={32} width={32} />}
                                 </IconButton>
                                 <Typography variant="body2" color="white" textAlign={'center'} display={'inline'} zIndex={1}>
                                     10.9K
                                 </Typography>
                                 <IconButton size="large" color="inherit" aria-label="menu">
-                                    <CommentIcon height={35} width={35} />
+                                    <CommentIcon height={32} width={32} />
                                 </IconButton>
                                 <Typography variant="body2" color="white" textAlign={'center'} display={'inline'} zIndex={1}>
                                     8.1K
                                 </Typography>
                                 <IconButton size="large" color="inherit" aria-label="menu">
-                                    <ShareIcon height={35} width={35} />
+                                    <ShareIcon height={32} width={32} />
                                 </IconButton>
                                 <Typography variant="body2" color="white" textAlign={'center'} display={'inline'} zIndex={1}>
                                     3.1K
                                 </Typography>
                                 <IconButton size="large" color="inherit" aria-label="menu">
                                     <MoreVertIcon sx={{
-                                        height: 37,
-                                        width: 37,
+                                        height: 32,
+                                        width: 32,
                                     }}
                                     />
                                 </IconButton>
