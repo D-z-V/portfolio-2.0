@@ -13,6 +13,7 @@ const Story = (props) => {
         100% { top: 0; left: 0; height: 100vh; width: 100vw; background-size: 100%; }
     `;
 
+
     if (props.clicked) {
         setTimeout(() => {
             setAnimation([0, 0]);
@@ -155,9 +156,19 @@ const Story = (props) => {
         cube.classList.remove('transition')
         scene.style.setProperty('--rotatePercent', 0)
         
+        if (left) {
         left.style.backgroundImage = `url(${images[leftIndex]})`
+        }
+
+        if (front) {
+
         front.style.backgroundImage = `url(${images[frontIndex]})`
+        }
+
+        if (right) {
         right.style.backgroundImage = `url(${images[rightIndex]})`
+
+        }
       }
 
     }, []);
@@ -181,9 +192,9 @@ const Story = (props) => {
                 className= "scene"
             >
                     <Box className="cube" sx={{ position: 'relative', width: '100vw', height: '100vh', transformStyle : 'preserve-3d', transform: 'translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))' }}>
-                        <div class="face face-left" ></div>
-                        <div class="face face-front"></div>
-                        <div class="face face-right"></div>
+                        <Box className="face face-left" ></Box>
+                        <Box className="face face-front"></Box>
+                        <Box className="face face-right"></Box>
                     </Box>
                 </Box>
         </>
