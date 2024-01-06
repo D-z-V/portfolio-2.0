@@ -210,9 +210,8 @@ img {
   left: 0;
   width: inherit;
   height: inherit;
-  background-size: 100% 85svh;
   background-repeat: no-repeat;
-  background-position: 20% 20%;
+  background-position: 50% 50%;
 }
 
 
@@ -226,4 +225,8 @@ img {
 
 .face-right {
   transform: rotateY(180deg) translateZ(50vw);
+}
+
+.MuiLinearProgress-bar1Determinate {
+  background-color: #8a8484 !important;
 }

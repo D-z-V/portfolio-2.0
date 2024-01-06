@@ -2,13 +2,16 @@ import { Box, IconButton } from "@mui/material";
 import { keyframes } from '@mui/system';
 import { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import LinearProgress from '@mui/material/LinearProgress';
 
-const animationTime = 0.25;
+const animationTime = 0.15;
 
 const Story = (props) => {
 
         const [clicked , setClicked] = useState(props.clicked);
         const [animation, setAnimation] = useState([ props.top + 50, props.left + 50]);
+        const [background, setBackground] = useState('0');
+        const [progress, setProgress] = useState(0);
 
         const storyAnimation = keyframes`
                 0% { height: 0; width: 0; top: ${props.top + 50}; left: ${props.left + 50}; background-size: 0; }
@@ -18,6 +21,7 @@ const Story = (props) => {
 
         if (props.clicked) {
                 setTimeout(() => {
+                        setBackground('100% 85svh');
                         setAnimation([0, 0]);
                 }, animationTime * 1000);
         }
@@ -28,6 +32,23 @@ const Story = (props) => {
         };
 
         useEffect(() => { 
+            const timer = setInterval(() => {
+                //linear progress bar that fills up in 5 seconds
+                setProgress((oldProgress) => {
+                    if (oldProgress === 100) {
+                        return 0;
+                    }
+
+                    return oldProgress + 1;
+                });
+            }, 50);
+
+            return () => {
+                clearInterval(timer);
+            };
+        }, []);
+
+        useEffect(() => {
         
         const images = [
                 'https://images.unsplash.com/photo-1629809666562-baf250ce0593?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=700&q=80',
@@ -39,6 +60,9 @@ const Story = (props) => {
                 'https://images.unsplash.com/photo-1504297050568-910d24c426d3?ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80',
                 'https://images.unsplash.com/photo-1629801892267-885d72f2dedf?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80',
             ]
+
+
+
             
             let touchX = 0
             let percentage = 0
@@ -192,7 +216,7 @@ const Story = (props) => {
                                         width: '100vw',
                                         top: animation[0],
                                         left: animation[1],
-                                        zIndex: '9999',
+                                        zIndex: '9998',
                                         display: clicked ? 'block' : 'none',
                                         animation: `${storyAnimation} ${animationTime}s ease-in`,
                                         boxSizing: 'border-box',
@@ -202,10 +226,38 @@ const Story = (props) => {
                                         <IconButton aria-label="close" sx={{ color: 'white', position: 'absolute', top: '1rem', right: '1rem', zIndex: '9999' }} onClick={handleClose}>
                                                 <CloseIcon height={32} width={32} />
                                         </IconButton>
+  
                                         <Box className="cube" sx={{ position: 'relative', width: '100vw', height: '100vh', transformStyle : 'preserve-3d', transform: 'translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))' }}>
-                                                <Box className="face face-left" ></Box>
-                                                <Box className="face face-front"></Box>
-                                                <Box className="face face-right"></Box>
+                                                <Box className="face face-left"
+                                                        sx={{
+                                                            backgroundSize: background,
+                                                    }}
+                                                
+                                                ></Box>
+                                                <Box className="face face-front"
+                                                        sx={{
+                                                                backgroundSize: background,
+                                                        }}
+
+                                                >
+
+                                                <LinearProgress variant="determinate" value={progress}  sx={
+                                                                                            {
+                                                                                                margin: '0.5rem 0 0.75rem 0',
+                                                                                                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+
+                                                                                            }
+                                                                                        }
+                                                                                        
+                                                                                        />
+
+                                                </Box>
+                                                <Box className="face face-right"
+                                                        sx={{
+                                                                backgroundSize: background,
+                                                        }}
+                                                
+                                                ></Box>
                                         </Box>
                                 </Box>
                 </>
