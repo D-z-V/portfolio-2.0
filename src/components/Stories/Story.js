@@ -207,59 +207,36 @@ const Story = (props) => {
 
         return (
                 <>
-
-                        <Box
-                                sx={{
-                                        backgroundColor: 'black',
-                                        height: '100vh',
-                                        position: 'absolute',
-                                        width: '100vw',
-                                        top: animation[0],
-                                        left: animation[1],
-                                        zIndex: '9998',
-                                        display: clicked ? 'block' : 'none',
-                                        animation: `${storyAnimation} ${animationTime}s ease-in`,
-                                        boxSizing: 'border-box',
-                                }}
-                                className= "scene"
+                    <Box
+                            sx={{
+                                    backgroundColor: 'black',
+                                    height: '100vh',
+                                    position: 'absolute',
+                                    width: '100vw',
+                                    top: animation[0],
+                                    left: animation[1],
+                                    zIndex: '9998',
+                                    display: clicked ? 'block' : 'none',
+                                    animation: `${storyAnimation} ${animationTime}s ease-in`,
+                                    boxSizing: 'border-box',
+                            }}
+                            className= "scene"
+                    >
+                        <IconButton aria-label="close" sx={{ color: 'white', position: 'absolute', top: '1rem', right: '1rem', zIndex: '9999' }} onClick={handleClose}
+                        
+                            onTouchEnd={handleClose}
                         >
-                                        <IconButton aria-label="close" sx={{ color: 'white', position: 'absolute', top: '1rem', right: '1rem', zIndex: '9999' }} onClick={handleClose}>
-                                                <CloseIcon height={32} width={32} />
-                                        </IconButton>
+                                <CloseIcon height={32} width={32} />
+                        </IconButton>
   
-                                        <Box className="cube" sx={{ position: 'relative', width: '100vw', height: '100vh', transformStyle : 'preserve-3d', transform: 'translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))' }}>
-                                                <Box className="face face-left"
-                                                        sx={{
-                                                            backgroundSize: background,
-                                                    }}
-                                                
-                                                ></Box>
-                                                <Box className="face face-front"
-                                                        sx={{
-                                                                backgroundSize: background,
-                                                        }}
-
-                                                >
-
-                                                <LinearProgress variant="determinate" value={progress}  sx={
-                                                                                            {
-                                                                                                margin: '0.5rem 0 0.75rem 0',
-                                                                                                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-
-                                                                                            }
-                                                                                        }
-                                                                                        
-                                                                                        />
-
-                                                </Box>
-                                                <Box className="face face-right"
-                                                        sx={{
-                                                                backgroundSize: background,
-                                                        }}
-                                                
-                                                ></Box>
-                                        </Box>
+                        <Box className="cube" sx={{ position: 'relative', width: '100vw', height: '100vh', transformStyle : 'preserve-3d', transform: 'translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))' }}>
+                                <Box className="face face-left" sx={{backgroundSize: background,}}></Box>
+                                <Box className="face face-front" sx={{backgroundSize: background,}}>
+                                    <LinearProgress variant="determinate" value={progress}  sx={{margin: '0.5rem 0 0.75rem 0', backgroundColor: 'rgba(255, 255, 255, 0.2)'}} />
                                 </Box>
+                                <Box className="face face-right" sx={{backgroundSize: background}}></Box>
+                        </Box>
+                    </Box>
                 </>
         )
 }

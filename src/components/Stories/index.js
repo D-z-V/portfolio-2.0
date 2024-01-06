@@ -131,6 +131,18 @@ const Stories = () => {
                 };
                 handleStoryClick(index, position);
               }}
+
+              onTouchEnd={
+                (event) => {
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  const position = {
+                    top: rect.top + window.scrollY,
+                    left: rect.left + window.scrollX,
+                  };
+                  handleStoryClick(index, position);
+                }
+              }
+
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
