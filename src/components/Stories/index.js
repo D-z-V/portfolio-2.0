@@ -17,7 +17,11 @@ const Stories = () => {
   const [iconPosition, setIconPosition] = React.useState({ top: 0, left: 0 });
 
   const handleStoryClick = (index, position) => {
-    setActiveIndex(index);
+    if (index === activeIndex) {
+      setActiveIndex(null);
+    } else {
+      setActiveIndex(index);
+    }
     setIconPosition(position);
   };
 
