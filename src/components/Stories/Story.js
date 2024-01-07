@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import LinearProgress from '@mui/material/LinearProgress';
 
-const animationTime = 0.15;
+const animationTime = 0.2;
 
 const Story = (props) => {
 
@@ -14,16 +14,16 @@ const Story = (props) => {
     const [progress, setProgress] = useState(0);
 
     const storyAnimation = keyframes`
-                0% { height: 0; width: 0; top: ${props.top + 50}; left: ${props.left + 50}; background-size: 0; }
-                100% { top: 0; left: 0; height: 100vh; width: 100vw; background-size: 100%; }
+                0% { height: 0; width: 0; top: ${props.top + 50}; left: ${props.left + 50}; }
+                100% { top: 0; left: 0; height: 100vh; width: 100vw; }
         `;
 
 
     if (props.clicked) {
         setTimeout(() => {
-            setBackground('100% 85svh');
+            setBackground('100% 75svh');
             setAnimation([0, 0]);
-        }, animationTime * 1000);
+        }, animationTime * 700);
     }
 
     const handleClose = () => {
@@ -32,20 +32,28 @@ const Story = (props) => {
 
     };
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            //linear progress bar that fills up in 5 seconds
-            setProgress((oldProgress) => {
-                if (oldProgress === 100) {
-                    return 0;
-                }
 
-                return oldProgress + 1;
-            });
-        }, 50);
+
+    useEffect(() => {
+        const duration = 3000; // 5 seconds
+        const steps = 100;
+        const interval = duration / steps;
+
+        const timer = setInterval(() => {
+        setProgress((oldProgress) => {
+            const increment = 100 / steps;
+            const newProgress = Math.min(oldProgress + increment, 100);
+
+            if (newProgress === 100) {
+            clearInterval(timer);
+            }
+
+            return newProgress;
+        });
+        }, interval);
 
         return () => {
-            clearInterval(timer);
+        clearInterval(timer);
         };
     }, []);
 
@@ -163,8 +171,10 @@ const Story = (props) => {
 
         function turn(direction) {
             if (direction === 1) { // Left
+                setProgress(0);
                 index--
             } else if (direction === -1) { // Right
+                setProgress(0);
                 index++
             }
 
@@ -240,11 +250,17 @@ const Story = (props) => {
                 </IconButton>
 
                 <Box className="cube" sx={{ position: 'relative', width: '100vw', height: '100vh', transformStyle: 'preserve-3d', transform: 'translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))' }}>
-                    <Box className="face face-left" sx={{ backgroundSize: background, }}></Box>
-                    <Box className="face face-front" sx={{ backgroundSize: background, }}>
-                        <LinearProgress variant="determinate" value={progress} sx={{ margin: '0.5rem 0 0.75rem 0', backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+                    <Box className="face face-left" sx={{ backgroundSize: background, backgroundPosition: "0% 30%",}}></Box>
+                    <Box className="face face-front" sx={{ backgroundSize: background,
+                    
+                        backgroundPosition: "0% 30%",
+                    }}>
+                        <LinearProgress variant="determinate" value={progress} sx={{ margin: '0.5rem 0 0.75rem 0', backgroundColor: 'rgba(255, 255, 255, 0.2)',
+
+
+                    }} />
                     </Box>
-                    <Box className="face face-right" sx={{ backgroundSize: background }}></Box>
+                    <Box className="face face-right" sx={{ backgroundSize: background, backgroundPosition: "0% 30%", }}></Box>
                 </Box>
             </Box>
         </>
