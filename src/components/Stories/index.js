@@ -132,16 +132,16 @@ const Stories = () => {
                 handleStoryClick(index, position);
               }}
 
-              onTouchEnd={
-                (event) => {
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  const position = {
-                    top: rect.top + window.scrollY,
-                    left: rect.left + window.scrollX,
-                  };
-                  handleStoryClick(index, position);
-                }
-              }
+              // onTouchEnd={
+              //   (event) => {
+              //     const rect = event.currentTarget.getBoundingClientRect();
+              //     const position = {
+              //       top: rect.top + window.scrollY,
+              //       left: rect.left + window.scrollX,
+              //     };
+              //     handleStoryClick(index, position);
+              //   }
+              // }
 
               sx={{
                 display: 'flex',
@@ -220,7 +220,10 @@ const Stories = () => {
         ))}
       </Box>
 
-      {activeIndex !== null && <Story top={iconPosition.top} left={iconPosition.left} clicked/>}
+      {activeIndex !== null && <Story top={iconPosition.top} left={iconPosition.left}   
+        setActiveIndex={setActiveIndex}
+      
+      clicked/>}
     </>
   );
 };
