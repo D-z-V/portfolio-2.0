@@ -127,7 +127,7 @@ const Navbar = (props) => {
                 <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 2 }} elevation={3}>
                     <BottomNavigation sx={{ backgroundColor: 'black' }}>
                         {Object.entries(TopNavComponents).map(([text, Icon]) => (
-                            <Link href={text == 'home' ? '/' : `/${text.toLowerCase()}`} key={text}>
+                            <Link href={text == 'home' ? '/' : `/${text.toLowerCase()}`} key={text} style={{ width: '100%' }}>
                                 <BottomNavigationAction key={text} label={text} icon={selectedNavIndex === text ? <Icon selected /> : <Icon />}
                                     sx={{
                                         color: 'white',

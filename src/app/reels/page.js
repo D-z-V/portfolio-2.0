@@ -54,7 +54,7 @@ const reels = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
 
-            <Box sx={{ scrollSnapType: "y mandatory" }}>
+            <Box sx={{ scrollSnapType: "y mandatory", backgroundColor: 'black' }}>
                 <Box sx={{ scrollSnapAlign: "start" }}>
                     <Reel start reelLink = "https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName = "Cyberpunk II" profilePic = "https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
                 </Box>

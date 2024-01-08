@@ -1,4 +1,4 @@
-import { Box, IconButton } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import { keyframes } from '@mui/system';
 import { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
@@ -21,7 +21,7 @@ const Story = (props) => {
 
     if (props.clicked) {
         setTimeout(() => {
-            setBackground('100% 75svh');
+            setBackground('100% 80svh');
             setAnimation([0, 0]);
         }, animationTime * 700);
     }
@@ -57,6 +57,31 @@ const Story = (props) => {
         };
     }, []);
 
+    let index = 0;
+
+    function turnOnClick(direction) {
+
+        let scene = document.querySelector('.scene')
+        let cube = document.querySelector('.cube')
+
+        if (direction === 1) { // Left
+            setProgress(0);
+            index--
+        } else if (direction === -1) { // Right
+            setProgress(0);
+            index++
+        }
+
+        if (cube) {
+            cube.classList.add('transition')
+        }
+
+        if (scene) {
+            scene.style.setProperty('--rotatePercent', direction)
+        }
+    }
+
+
     useEffect(() => {
         
         const images = [
@@ -77,7 +102,7 @@ const Story = (props) => {
         let percentage = 0
         const scene = document.querySelector('.scene')
         const cube = document.querySelector('.cube')
-        let index = 0
+
         let isMouseDownFlag = false
 
         setFaces()
@@ -250,17 +275,11 @@ const Story = (props) => {
                 </IconButton>
 
                 <Box className="cube" sx={{ position: 'relative', width: '100vw', height: '100vh', transformStyle: 'preserve-3d', transform: 'translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))' }}>
-                    <Box className="face face-left" sx={{ backgroundSize: background, backgroundPosition: "0% 30%",}}></Box>
-                    <Box className="face face-front" sx={{ backgroundSize: background,
-                    
-                        backgroundPosition: "0% 30%",
-                    }}>
-                        <LinearProgress variant="determinate" value={progress} sx={{ margin: '0.5rem 0 0.75rem 0', backgroundColor: 'rgba(255, 255, 255, 0.2)',
-
-
-                    }} />
+                    <Box className="face face-left" sx={{ backgroundSize: background, backgroundPosition: "0% 30%", cursor: 'pointer' }} ></Box>
+                    <Box className="face face-front" sx={{ backgroundSize: background, backgroundPosition: "0% 30%", cursor: 'pointer' }}>
+                        <LinearProgress variant="determinate" value={progress} sx={{ margin: '0.5rem 0 0.75rem 0', backgroundColor: 'rgba(255, 255, 255, 0.2)', mx: '0.5rem'}} />
                     </Box>
-                    <Box className="face face-right" sx={{ backgroundSize: background, backgroundPosition: "0% 30%", }}></Box>
+                    <Box className="face face-right" sx={{ backgroundSize: background, backgroundPosition: "0% 30%", cursor: 'pointer' }} onClick={() => turn(1)}></Box>
                 </Box>
             </Box>
         </>

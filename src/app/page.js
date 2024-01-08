@@ -32,7 +32,7 @@ export default function Home() {
       setTimeout(() => {
         setLoading(false);
         firstLoadFlag = true;
-      }, 1000);
+      }, 200);
     }
   }, []);
 
@@ -75,7 +75,7 @@ export default function Home() {
 
   return (
 
-    <Box sx={{ display: 'flex', height: '100vh' }}>
+    <Box sx={{ display: 'flex', height: '100vh', backgroundColor: 'black' }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
                 {loading ? (
