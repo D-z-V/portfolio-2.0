@@ -12,9 +12,10 @@ const Posts = () => {
     }
     
     return (
-        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', pb: '3rem',}}>
+        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', pb: '3rem', backgroundColor: 'black'}}>
             <PostCard  {...props} />
             <PostCard  {...props} />
+                        <PostCard  {...props} />
         </Box>
     );
     }

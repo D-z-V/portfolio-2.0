@@ -15,6 +15,9 @@ import Navbar from '@/components/Navbar';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Reel from '@/components/Reel';
 
+const drawerWidth = 240;
+
+
 const reels = () => {
     const theme = React.useMemo(
         () =>
@@ -66,7 +69,7 @@ const reels = () => {
                 </Box>
             </Box>
 
-            <Navbar />
+            <Navbar drawerWidth={drawerWidth} />
         </ThemeProvider>
     );
 }

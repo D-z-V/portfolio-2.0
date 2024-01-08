@@ -11,7 +11,6 @@ import { Box, CssBaseline } from '@mui/material';
 import ProfileIcon from '@/Icons/ProfileIcon';
 import ShareIcon from '@/Icons/ShareIcon';
 import CommentIcon from '@/Icons/CommentIcon';
-import Navbar from '@/components/Navbar';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
