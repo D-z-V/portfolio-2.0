@@ -10,8 +10,10 @@ import Navbar from "@/components/Navbar";
 import Appbar from "@/components/Appbar";
 import Stories from "@/components/Stories";
 import Posts from "@/components/Posts";
+import Reels from '@/components/Reel';
 
 import CircularProgress from '@mui/material/CircularProgress';
+import NextTopLoader from 'nextjs-toploader';
 
 const drawerWidth = 240;
 
@@ -20,19 +22,16 @@ let firstLoadFlag = false;
 export default function Home() {
 
   //for the first 2 seconds display the loading screen
-
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-
     if (firstLoadFlag) {
       setLoading(false);
-    }
-    else {
+    } else {
       setTimeout(() => {
         setLoading(false);
         firstLoadFlag = true;
-      }, 200);
+      }, 100);
     }
   }, []);
 
@@ -65,57 +64,60 @@ export default function Home() {
             },
           },
         },
-      }), []);
-
-  // if (loading) {
-  //   return (
-
-  //   )
-  // }
+      }),
+    []
+  );
 
   return (
+    <>
+      <NextTopLoader
+        color="linear-gradient(45deg, #405DE6, #FFD166)"
+        shadow="0 0 10px #405DE6, 0 0 5px #405DE6, 0 0 10px #FFD166, 0 0 5px #FFD166"
+        height={4}
+      />
 
-    <Box sx={{ display: 'flex', height: '100vh', backgroundColor: 'black' }}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-                {loading ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: 'black', width: 'calc(100vw + 500px)' }}>
-            <CircularProgress />
-          </Box>
-        ) : (
+      <Box sx={{ display: 'flex', height: '100vh', backgroundColor: 'black' }}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {loading ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: 'black', width: 'calc(100vw + 500px)' }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <>
+              {size.width > 900 && <Navbar drawerWidth={drawerWidth} />}
 
+              {size.width <= 900 ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden', overflowY: 'scroll' }}>
+                  <Appbar />
 
-        <>
-        {size.width > 900 && <Navbar drawerWidth={drawerWidth} />}
+                  <Box
+                    component="main"
+                    sx={{ flexGrow: 1, p: 0, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white' }}
+                  >
 
+                    <Stories />
+                    <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+                    <Posts />
 
-        {size.width <= 900 ? (
-              <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden', overflowY: 'scroll' }}>
-                <Appbar />
+                  </Box>
 
+                </Box>
+              ) : (
                 <Box
                   component="main"
-                  sx={{ flexGrow: 1, p: 0, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white' }}
+                  sx={{ flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white' }}
                 >
-                  <Stories />
-                  <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
-                  <Posts />
+                      <Stories />
+                      <Posts mobile />
                 </Box>
+              )}
 
-              </Box>
-        ) : (
-          <Box
-            component="main"
-            sx={{ flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white' }}>
-            <Stories />
-            <Posts mobile />
-          </Box>
-        )}
-
-        {size.width <= 900 && <Navbar drawerWidth={drawerWidth} />}
-                </>
-        )}
-      </ThemeProvider>
-    </Box>
+              {size.width <= 900 && <Navbar drawerWidth={drawerWidth} />}
+            </>
+          )}
+        </ThemeProvider>
+      </Box>
+    </>
   )
 }

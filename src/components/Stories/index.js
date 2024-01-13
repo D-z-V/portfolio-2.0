@@ -38,6 +38,7 @@ const Stories = () => {
     'Git': 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Git_icon.svg',
     'Github': 'https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg',
     'Heroku': 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Heroku_logo.svg',
+    'Android': 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg',
   }
 
   return (
@@ -70,27 +71,27 @@ const Stories = () => {
               padding: '3rem',
               borderRadius: '50%',
               height: '80px',
-              width: '100px',
+              width: '85px',
             }}
             className='story'
           >
             <>
-              {/* <Image src={dynamicStory} alt="dynamic story" width={85} height={85} /> */}
+              {/* <Image src={dynamicStory} alt="dynamic story" width={65} height={65} /> */}
               <Box
                 sx={{
                   backgroundColor: 'white',
                   borderRadius: '50%',
-                  height: '70px',
-                  width: '70px',
+                  height: '60px',
+                  width: '60px',
                   position: 'absolute',
-                  padding: '0.15rem',
+
                 }}
               >
                 <Image
                   src={"https://www.svgrepo.com/show/424916/meta-logo-facebook.svg"}
                   alt={"NextJS"}
-                  width={65}
-                  height={65}
+                  width={60}
+                  height={60}
                   style={{
                     position: 'absolute',
                     // top: { md: '12%', sm: '10%' },
@@ -108,7 +109,7 @@ const Stories = () => {
                     left: '68%',
                     borderRadius: '50%',
                     border: '2px solid black',
-                    fontSize: '1.65rem',
+                    fontSize: '1.55rem',
                   }}
                 />
               </Box>
@@ -148,22 +149,23 @@ const Stories = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '3rem',
+                padding: '1rem',
                 borderRadius: '50%',
                 height: '80px',
-                width: '100px',
+                width: '85px',
+                px: 0,
               }}
               className='story'
             >
               {index === activeIndex ? (
                 <>
-                  <Image src={dynamicStory} alt="dynamic story" width={85} height={85} />
+                  <Image src={dynamicStory} alt="dynamic story" width={75} height={75} />
                   <Box
                     sx={{
                       backgroundColor: 'white',
                       borderRadius: '50%',
-                      height: '65px',
-                      width: '65px',
+                      height: '60px',
+                      width: '60px',
                       position: 'absolute',
                       padding: '0.25rem',
                     }}
@@ -171,8 +173,8 @@ const Stories = () => {
                     <Image
                       src={value}
                       alt={key}
-                      width={55}
-                      height={55}
+                      width={45}
+                      height={45}
                       style={{
                         position: 'absolute',
                         // top: { md: '12%', sm: '10%' },
@@ -185,22 +187,22 @@ const Stories = () => {
                 </>
               ) : (
                 <>
-                  <Image src={staticStory} alt="static story" width={85} height={85} />
+                  <Image src={staticStory} alt="static story" width={75} height={75} />
                   <Box
                     sx={{
                       backgroundColor: 'white',
                       borderRadius: '50%',
-                      height: '65px',
-                      width: '65px',
+                      height: '60px',
+                      width: '60px',
                       position: 'absolute',
-                      padding: '0.25rem',
+                      padding: '0.4rem',
                     }}
                   >
                     <Image
                       src={value}
                       alt={key}
-                      width={55}
-                      height={55}
+                      width={45}
+                      height={45}
                       style={{
                         position: 'absolute',
                         // top: { md: '12%', sm: '10%' },

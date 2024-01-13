@@ -13,7 +13,7 @@ import ShareIcon from '@/Icons/ShareIcon';
 import CommentIcon from '@/Icons/CommentIcon';
 import Navbar from '@/components/Navbar';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Reel from '@/components/Reel';
+
 
 const explore = () => {
     return (
