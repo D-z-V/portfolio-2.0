@@ -230,3 +230,7 @@ img {
 .MuiLinearProgress-bar1Determinate {
   background-color: #8a8484 !important;
 }
+
+.Mui-selected {
+  color: #ffffff !important;
+}
