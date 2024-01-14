@@ -11,13 +11,17 @@ import Appbar from "@/components/Appbar";
 import Stories from "@/components/Stories";
 import Posts from "@/components/Posts";
 import Reels from '@/components/Reel';
-
+import Image from 'next/image';
+import localFont from 'next/font/local';
 import CircularProgress from '@mui/material/CircularProgress';
 import NextTopLoader from 'nextjs-toploader';
+import Typography from '@mui/material/Typography';
 
 const drawerWidth = 240;
 
 let firstLoadFlag = false;
+
+const instagramLogoFont = localFont({ src: '../fonts/GrandHotel-Regular.ttf' });
 
 export default function Home() {
 
@@ -81,7 +85,26 @@ export default function Home() {
           <CssBaseline />
           {loading ? (
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: 'black', width: 'calc(100vw + 500px)' }}>
-              <CircularProgress />
+                                <Typography
+                    variant="h2"
+                    noWrap
+                    component="div"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      minHeight: '50px',
+                      cursor: 'pointer',
+                      fontSize: '5.25rem',
+
+                    }}
+                  >
+                    <p
+                      className={`navbar__logo loader ${instagramLogoFont.className}`}
+                      style={{ padding: '0.5rem 0', margin: '0' }}
+                    >
+                      Portfolio
+                    </p>
+                  </Typography>
             </Box>
           ) : (
             <>

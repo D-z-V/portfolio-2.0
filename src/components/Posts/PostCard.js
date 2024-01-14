@@ -13,10 +13,10 @@ import Box from '@mui/material/Box';
 import Image from 'next/image';
 
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ProfileIcon from '@/Icons/ProfileIcon';
-import CommentIcon from '@/Icons/CommentIcon';
-import ShareIcon from '@/Icons/ShareIcon';
-import BookmarkIcon from '@/Icons/BookmarkIcon';
+import ProfileIcon from '@/icons/ProfileIcon';
+import CommentIcon from '@/icons/CommentIcon';
+import ShareIcon from '@/icons/ShareIcon';
+import BookmarkIcon from '@/icons/BookmarkIcon';
 
 const PostCard = (props) => {
     const [expanded, setExpanded] = useState(false);

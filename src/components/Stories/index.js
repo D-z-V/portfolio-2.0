@@ -68,7 +68,6 @@ const Stories = () => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '3rem',
               borderRadius: '50%',
               height: '80px',
               width: '85px',

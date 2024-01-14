@@ -11,13 +11,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 
-import HomeIcon from '@/Icons/HomeIcon';
-import ExploreIcon from '@/Icons/ExploreIcon';
-import ProjectIcon from '@/Icons/ProjectIcon';
-import ProfileIcon from '@/Icons/ProfileIcon';
-import ContactIcon from '@/Icons/ContactIcon';
-import MoreIcon from '@/Icons/MoreIcon';
-import BlogIcon from '@/Icons/BlogIcon';
+import HomeIcon from '@/icons/HomeIcon';
+import ExploreIcon from '@/icons/ExploreIcon';
+import ProjectIcon from '@/icons/ProjectIcon';
+import ProfileIcon from '@/icons/ProfileIcon';
+import ContactIcon from '@/icons/ContactIcon';
+import MoreIcon from '@/icons/MoreIcon';
+import BlogIcon from '@/icons/BlogIcon';
 
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
@@ -104,7 +104,7 @@ const Navbar = (props) => {
         <>
             <Box
                 component="nav"
-                sx={{ width: { md: props.drawerWidth }, flexShrink: { md: 0 }, height: '100vh' }}
+                sx={{ width: { md: props.drawerWidth }, flexShrink: { md: 0 }, height: '10vh' }}
                 aria-label="mailbox folders"
             >
                 <Drawer

@@ -7,8 +7,8 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 
-import ContactIcon from '@/Icons/ContactIcon';
-import ProfileIcon from '@/Icons/ProfileIcon';
+import ContactIcon from '@/icons/ContactIcon';
+import ProfileIcon from '@/icons/ProfileIcon';
 
 const instagramLogoFont = localFont({ src: '../../fonts/GrandHotel-Regular.ttf' });
 

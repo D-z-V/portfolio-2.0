@@ -17,8 +17,41 @@ import Stories from '@/components/Stories';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import PropTypes from 'prop-types';
+import Grid from '@/components/Grid';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import Resume from '@/components/Resume';
 
 const drawerWidth = 240;
+
+
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`vertical-tabpanel-${index}`}
+        aria-labelledby={`vertical-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ py: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', color: 'white' }}>
+            <Typography
+                sx={{ width: {md : 'calc(100% - 5rem)', lg : 'calc(100% - 20rem)'}, display: 'flex', flexDirection: 'column',textAlign: 'center', fontSize: '1.5rem', fontWeight: 600, mb: 2 }}
+            >{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+  
+  TabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.number.isRequired,
+    value: PropTypes.number.isRequired,
+  };
 
 const profile = () => {
 
@@ -77,33 +110,37 @@ const profile = () => {
                             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', height: '100vh', margin: '1rem', height: { md: `calc(100vh - 64px)` }, marginTop: '1rem' }}>
                                 <Typography variant="h5" sx={{ color: 'white', fontWeight: 600 }}>sn1pe._</Typography>
                                 <Box>
-                                    <IconButton size="large" color="inherit" aria-label="menu" sx={{ p: 0, mx: 2 }}>
+                                    <IconButton size="large" color="inherit" aria-label="menu" sx={{ p: 0}}>
                                         <LinkedInIcon sx={{ color: 'white', fontSize: '2rem' }} />
                                     </IconButton>
-                                    <IconButton size="large" color="inherit" aria-label="menu" sx={{ p: 0 }}>
+                                    <IconButton size="large" color="inherit" aria-label="menu" sx={{ p: 0, mx: 2  }}>
                                         <InstagramIcon sx={{ color: 'white', fontSize: '2rem' }} />
+                                    </IconButton>
+                                    <IconButton size="large" color="inherit" aria-label="menu" sx={{ p: 0 }}>
+                                        <GitHubIcon sx={{ color: 'white', fontSize: '2rem' }} />
                                     </IconButton>
                                 </Box>
                             </Box>
                             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', m: "0.5rem" }}>
-                                <Avatar sx={{ height: 110, width: 110, mr: 1 }}>
-                                    <Image src={'https://picsum.photos/200/300'} alt="profile" width={120} height={120} />
+                                <Avatar sx={{ height: 100, width: 100, mr: 1 }}>
+                                    <Image src={'https://picsum.photos/200/300'} alt="profile" width={100} height={100} />
                                 </Avatar>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', m: 1 }}>
                                     <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem", fontWeight: 600 }}>0</Typography>
-                                    <Typography variant='body1' sx={{ color: 'white', fontSize: "1rem" }}>Posts</Typography>
+                                    <Typography variant='body1' sx={{ color: 'white', fontSize: "1rem" }}>Projects</Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', m: 1 }}>
                                     <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem", fontWeight: 600 }}>400</Typography>
-                                    <Typography variant='body1' sx={{ color: 'white', fontSize: "1rem" }}>Followers</Typography>
+                                    <Typography variant='body1' sx={{ color: 'white', fontSize: "1rem" }}>Visited</Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', m: 1 }}>
                                     <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem", fontWeight: 600 }}>450</Typography>
-                                    <Typography variant='body1' sx={{ color: 'white', fontSize: "1Srem" }}>Following</Typography>
+                                    <Typography variant='body1' sx={{ color: 'white', fontSize: "1Srem" }}>Downloads</Typography>
                                 </Box>
                             </Box>
-                            <Typography variant="body1" sx={{ color: 'white', fontSize: "1rem", fontWeight: 600, m: "0.5rem" }}>Dev Bhandari</Typography>
-                            <Button variant="contained" sx={{ color: 'white', mt: '1rem', height: "2.25rem", borderRadius: "0.5rem", m: "0.5rem", mb: "1rem" }}>Resume</Button>
+                            <Typography variant="body1" sx={{ color: 'white', fontSize: "1rem", fontWeight: 600, mx: "0.75rem" }}>Dev Bhandari</Typography>
+                            <Typography variant="body1" sx={{ color: 'white', fontSize: "1rem",  mx: "0.75rem" }}>Schlumbeger | NIT Trichy ✨</Typography>
+                            <Button variant="contained" sx={{ color: 'white',  height: "2.25rem", borderRadius: "0.5rem", m: "0.5rem", my: '0.75rem' }}>Download Resume</Button>
                             <Stories />
 
                             <Tabs value={value} onChange={handleChange}
@@ -116,7 +153,7 @@ const profile = () => {
                                     }
                                 }}
                                 sx={{
-                                    my: "1rem",
+                                    mt: "1rem",
                                 }}
                             >
                                 <Tab label={
@@ -137,6 +174,15 @@ const profile = () => {
 
                                 } sx={{ color: 'white' }} />
                             </Tabs>
+                            <TabPanel value={value} index={0}>
+                                Item One
+                                </TabPanel>
+                                <TabPanel value={value} index={1}>
+                                    <Grid />
+                                </TabPanel>
+                                <TabPanel value={value} index={2}>
+                                Item Three
+                            </TabPanel>
                         </Box>
                     </>
 
@@ -149,24 +195,30 @@ const profile = () => {
                             <Box sx={{ ml: '5rem', display: 'flex', flexDirection: 'column' }}>
                                 <Box sx={{ display: 'flex', flexDirection: 'row', }}>
                                     <Typography variant="h5" sx={{ color: 'white', marginTop: '1rem' }}>sn1pe._</Typography>
-                                    <Button variant="contained" sx={{ p: 2, backgroundColor: 'rgb(54, 54, 54)', color: 'white', m: '1rem', ml: '2rem', height: "2rem", borderRadius: "0.5rem" }}>LinkedIn</Button>
-                                    <Button variant="contained" sx={{ p: 2, backgroundColor: 'rgb(54, 54, 54)', color: 'white', my: '1rem', height: "2rem", borderRadius: "0.5rem" }}>Instagram</Button>
+                                    <Button variant="contained" sx={{ p: 3, backgroundColor: 'rgb(54, 54, 54)', color: 'white', m: '1rem', ml: '2rem', height: "2rem", borderRadius: "0.5rem" }}> 
+                                    <LinkedInIcon sx={{ color: 'white', fontSize: '2rem' }} />
+
+                                    LinkedIn</Button>
+                                    <Button variant="contained" sx={{ p: 3, backgroundColor: 'rgb(54, 54, 54)', color: 'white', my: '1rem', height: "2rem", borderRadius: "0.5rem" }}>
+                                        
+                                    <GitHubIcon sx={{ color: 'white', fontSize: '2rem'}} />
+                                        GitHub</Button>
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mt: "1rem" }}>
-                                    <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem" }}><span style={{ fontWeight: 600, }}>0</span> posts</Typography>
-                                    <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem" }}><span style={{ fontWeight: 600, }}>400</span> followers</Typography>
-                                    <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem" }}><span style={{ fontWeight: 600, }}>500</span> following</Typography>
+                                    <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem" }}><span style={{ fontWeight: 600, }}>10</span> Projects</Typography>
+                                    <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem" }}><span style={{ fontWeight: 600, }}>400</span> Visited</Typography>
+                                    <Typography variant="body1" sx={{ color: 'white', fontSize: "1.25rem" }}><span style={{ fontWeight: 600, }}>500</span> Downloads</Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', mt: "1rem" }}>
                                     <Typography variant="body1" sx={{ color: 'white', fontSize: "1rem" }}><span style={{ fontWeight: 500 }}>Dev Bhandari</span></Typography>
-                                    <Button variant="contained" sx={{ color: 'white', mt: '1rem', height: "2.25rem", borderRadius: "0.75rem" }}>Resume</Button>
+                                    <Button variant="contained" sx={{ color: 'white', mt: '1rem', height: "2.25rem", borderRadius: "0.75rem" }}>Download Resume</Button>
                                 </Box>
 
                             </Box>
                         </Box>
                         <Stories />
                         <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.3)', mx: "3.5rem", my: "2.5rem", mb: 0 }} />
-                        <Box sx={{ width: '100%', backgroundColor: 'black', color: 'white', display: 'flex', flexDirection: 'row', justifyContent: 'center', mx: "2rem" }}>
+                        <Box sx={{ width: '100%', backgroundColor: 'black', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', mx: "2rem" }}>
                             <Tabs value={value} onChange={handleChange} centered
                                 sx={{
                                     mx: "3.5rem",
@@ -207,6 +259,15 @@ const profile = () => {
                                     </Box>
                                 } sx={{ color: 'white' }} />
                             </Tabs>
+                            <TabPanel value={value} index={0}>
+                                Item One
+                                </TabPanel>
+                                <TabPanel value={value} index={1}>
+                                    <Grid />
+                                </TabPanel>
+                                <TabPanel value={value} index={2}>
+                                Item Three
+                            </TabPanel>
                         </Box>
                     </Box>
 
@@ -217,7 +278,7 @@ const profile = () => {
 
             </ThemeProvider>
 
-            <Navbar drawerWidth={drawerWidth} />
+            {size.width > 900 && <Navbar drawerWidth={drawerWidth} />}
         </>
     )
 }
