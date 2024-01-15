@@ -26,19 +26,18 @@ import Paper from '@mui/material/Paper';
 const instagramLogoFont = localFont({ src: '../../fonts/GrandHotel-Regular.ttf' });
 
 const Navbar = (props) => {
-    const [selectedNavIndex, setSelectedNavIndex] = useState('Home');
-    const ref = useRef(null);
+    // const [selectedNavIndex, setSelectedNavIndex] = useState('Home');
+    // const ref = useRef(null);
 
-    useEffect(() => {
-        ref.current.ownerDocument.body.scrollTop = 0;
-    }, [selectedNavIndex]);
+    // useEffect(() => {
+    //     ref.current.ownerDocument.body.scrollTop = 0;
+    // }, [selectedNavIndex]);
 
     const TopNavComponents = {
         'home': HomeIcon,
         'explore': ExploreIcon,
         'reels': ProjectIcon,
         'profile': ProfileIcon,
-        'blog': BlogIcon,
     }
 
     const BottomNavComponents = {
@@ -61,9 +60,11 @@ const Navbar = (props) => {
                                     '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }, borderRadius: '12px', padding: '0.5rem',
                                     margin: '0 0.25rem'
                                 }}
-                                onClick={() => setSelectedNavIndex(text)}
+                                // onClick={() => setSelectedNavIndex(text)}
                             >
-                                {selectedNavIndex === text ? <Icon selected /> : <Icon />}
+                                {/* {selectedNavIndex === text ? <Icon selected /> : <Icon />}
+                                 */}
+                                 <Icon />
                                 <ListItemText primary={text.charAt(0).toUpperCase() + text.slice(1)}
                                     sx={{
                                         marginLeft: '1.25rem',
@@ -84,9 +85,10 @@ const Navbar = (props) => {
                                 '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }, borderRadius: '12px', padding: '0.5rem',
                                 margin: '0 0.25rem'
                             }}
-                            onClick={() => setSelectedNavIndex(text)}
+                            // onClick={() => setSelectedNavIndex(text)}
                         >
-                            {selectedNavIndex === text ? <Icon selected /> : <Icon />}
+                            {props.page === text ? <Icon selected /> : <Icon />}
+                            <Icon />
                             <ListItemText primary={text.charAt(0).toUpperCase() + text.slice(1)}
                                 sx={{
                                     marginLeft: '1.25rem',
@@ -123,17 +125,17 @@ const Navbar = (props) => {
                 </Drawer>
             </Box>
 
-            <Box ref={ref} display={{ xs: 'block', sm: 'block', md: 'none' }}>
+            <Box display={{ xs: 'block', sm: 'block', md: 'none' }}>
                 <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 2 }} elevation={3}>
                     <BottomNavigation sx={{ backgroundColor: 'black' }}>
                         {Object.entries(TopNavComponents).map(([text, Icon]) => (
                             <Link href={text == 'home' ? '/' : `/${text.toLowerCase()}`} key={text} style={{ width: '100%' }}>
-                                <BottomNavigationAction key={text} label={text} icon={selectedNavIndex === text ? <Icon selected /> : <Icon />}
+                                <BottomNavigationAction key={text} label={text} icon={props.page === text ? <Icon selected /> : <Icon />}
                                     sx={{
                                         color: 'white',
                                         paddingX: '0rem',
                                     }}
-                                    onClick={() => setSelectedNavIndex(text)}
+                                    // onClick={() => setSelectedNavIndex(text)}
                                 />
                             </Link>
                         ))}

@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';    
 import Image from 'next/image';
+import { Skeleton } from '@mui/material';
 
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ProfileIcon from '@/icons/ProfileIcon';
@@ -26,6 +27,8 @@ const PostCard = (props) => {
     const [lastTap, setLastTap] = useState(0);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(0);
+
+    const [postLoading, setPostLoading] = useState(true);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -83,19 +86,22 @@ const PostCard = (props) => {
                 titleTypographyProps={{ fontWeight: 500, variant: 'body2', textAlign: 'left', fontSize: '1rem' }}
                 sx={{ px: 1, py: '0.75rem' }}
             />
-            <Button onDoubleClick={handleCardMediaDoubleClick} onTouchStart={handleTouchStart} sx={{ width: '100%', p: 0 }} disableFocusRipple={true} disableRipple={true} disableTouchRipple={true}>
-                <CardMedia
-                    component="img"
-                    sx={{ maxHeight: 500 }}
-                    image={ props.postPicture }
-                    alt="Paella dish"
-                />
-                {mediaDoubleClick && (
-                    <Box position={'absolute'} className={'doubleTapIcon'} color={'white'}>
-                        <ProfileIcon height={120} width={120} selected />
-                    </Box>
-                )}
-            </Button>
+            {postLoading && <Skeleton variant="rectangular" width={'100%'} height={500} animation="wave" sx={{ borderRadius: 0, backgroundColor: "rgba(255, 255, 255, 0.13)" }} />}
+                <Button onDoubleClick={handleCardMediaDoubleClick} onTouchStart={handleTouchStart} sx={{ width: '100%', p: 0 }} disableFocusRipple={true} disableRipple={true} disableTouchRipple={true}>
+                    <CardMedia
+                        component="img"
+                        sx={{ maxHeight: 500 }}
+                        image={ props.postPicture }
+                        alt="Paella dish"
+                        onLoad={() => setPostLoading(false)}
+                    />
+                    {mediaDoubleClick && (
+                        <Box position={'absolute'} className={'doubleTapIcon'} color={'white'}>
+                            <ProfileIcon height={120} width={120} selected />
+                        </Box>
+                    )}
+                </Button>
+
             <CardContent sx={{ px: 1, py: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box>
                     <IconButton aria-label="add to favorites" sx={{ color: 'white', pl: 0, pr: 1 }} onClick={handleHeartClick}>

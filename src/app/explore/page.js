@@ -91,11 +91,11 @@ const Explore = () => {
 
                 )}
 
-                {size.width <= 900 && <Navbar drawerWidth={drawerWidth} />}
+                {size.width <= 900 && <Navbar drawerWidth={drawerWidth} page = "explore" />}
 
             </ThemeProvider>
 
-            {size.width > 900 && <Navbar drawerWidth={drawerWidth} />}
+            {size.width > 900 && <Navbar drawerWidth={drawerWidth} page="explore" />}
         </>
     );
 }

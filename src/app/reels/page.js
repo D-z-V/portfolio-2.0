@@ -102,11 +102,11 @@ const Reels = () => {
 
               )}
 
-              {size.width <= 900 && <Navbar drawerWidth={drawerWidth} />}
+              {size.width <= 900 && <Navbar drawerWidth={drawerWidth} page="reels" />}
 
             </ThemeProvider>
 
-            <Navbar drawerWidth={drawerWidth} />
+            <Navbar drawerWidth={drawerWidth} page="reels" />
         </>
     );
 }

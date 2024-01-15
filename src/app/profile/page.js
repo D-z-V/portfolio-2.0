@@ -141,7 +141,7 @@ const profile = () => {
                             <Typography variant="body1" sx={{ color: 'white', fontSize: "1rem", fontWeight: 600, mx: "0.75rem" }}>Dev Bhandari</Typography>
                             <Typography variant="body1" sx={{ color: 'white', fontSize: "1rem",  mx: "0.75rem" }}>Schlumbeger | NIT Trichy ✨</Typography>
                             <Button variant="contained" sx={{ color: 'white',  height: "2.25rem", borderRadius: "0.5rem", m: "0.5rem", my: '0.75rem' }}>Download Resume</Button>
-                            <Stories />
+                            <Stories viewed />
 
                             <Tabs value={value} onChange={handleChange}
                                 variant="fullWidth"
@@ -216,7 +216,7 @@ const profile = () => {
 
                             </Box>
                         </Box>
-                        <Stories />
+                        <Stories viewed />
                         <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.3)', mx: "3.5rem", my: "2.5rem", mb: 0 }} />
                         <Box sx={{ width: '100%', backgroundColor: 'black', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', mx: "2rem" }}>
                             <Tabs value={value} onChange={handleChange} centered
@@ -273,12 +273,12 @@ const profile = () => {
 
                 )}
 
-                {size.width <= 900 && <Navbar drawerWidth={drawerWidth} />}
+                {size.width <= 900 && <Navbar drawerWidth={drawerWidth} page="profile" />}
 
 
             </ThemeProvider>
 
-            {size.width > 900 && <Navbar drawerWidth={drawerWidth} />}
+            {size.width > 900 && <Navbar drawerWidth={drawerWidth} page="profile" />}
         </>
     )
 }

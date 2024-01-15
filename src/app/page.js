@@ -108,7 +108,7 @@ export default function Home() {
             </Box>
           ) : (
             <>
-              {size.width > 900 && <Navbar drawerWidth={drawerWidth} />}
+              {size.width > 900 && <Navbar drawerWidth={drawerWidth} page="home" />}
 
               {size.width <= 900 ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden', overflowY: 'scroll' }}>
@@ -136,7 +136,7 @@ export default function Home() {
                 </Box>
               )}
 
-              {size.width <= 900 && <Navbar drawerWidth={drawerWidth} />}
+              {size.width <= 900 && <Navbar drawerWidth={drawerWidth} page = "home" />}
             </>
           )}
         </ThemeProvider>
