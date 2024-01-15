@@ -119,7 +119,7 @@ export default function Home() {
                     sx={{ flexGrow: 1, p: 0, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white' }}
                   >
 
-                    <Stories />
+                    <Stories width = {size.width} />
                     <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
                     <Posts />
 
@@ -131,7 +131,7 @@ export default function Home() {
                   component="main"
                   sx={{ flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white' }}
                 >
-                      <Stories />
+                      <Stories width = {size.width} />
                       <Posts mobile />
                 </Box>
               )}

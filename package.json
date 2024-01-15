@@ -19,6 +19,7 @@
     "nextjs-toploader": "^1.6.4",
     "react": "^18",
     "react-dom": "^18",
+    "stories-react": "^1.1.2",
     "styled-components": "^6.1.1"
   }
 }

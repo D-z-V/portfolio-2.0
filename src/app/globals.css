@@ -185,7 +185,7 @@ img {
   }
 } */ 
 
-.scene {
+/* .scene {
   perspective: 300vw;
   width: 100vw;
   --rotatePercent: 0;
@@ -225,7 +225,7 @@ img {
 
 .face-right {
   transform: rotateY(180deg) translateZ(50vw);
-}
+} */
 
 .MuiLinearProgress-bar1Determinate {
   background-color: #8a8484 !important;

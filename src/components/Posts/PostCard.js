@@ -90,7 +90,7 @@ const PostCard = (props) => {
                 <Button onDoubleClick={handleCardMediaDoubleClick} onTouchStart={handleTouchStart} sx={{ width: '100%', p: 0 }} disableFocusRipple={true} disableRipple={true} disableTouchRipple={true}>
                     <CardMedia
                         component="img"
-                        sx={{ maxHeight: 500 }}
+                        sx={{ maxHeight: 500, display: postLoading ? 'none' : 'block' }}
                         image={ props.postPicture }
                         alt="Paella dish"
                         onLoad={() => setPostLoading(false)}
