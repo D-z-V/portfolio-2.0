@@ -2,7 +2,7 @@
 const nextConfig = {
     reactStrictMode: true,
     images: {
-      domains: ['upload.wikimedia.org', 'picsum.photos'],
+      domains: ['upload.wikimedia.org', 'picsum.photos', 'i.ibb.co'],
     },
 }
 
