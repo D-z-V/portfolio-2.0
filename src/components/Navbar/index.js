@@ -26,13 +26,7 @@ import Paper from '@mui/material/Paper';
 const instagramLogoFont = localFont({ src: '../../fonts/GrandHotel-Regular.ttf' });
 
 const Navbar = (props) => {
-    // const [selectedNavIndex, setSelectedNavIndex] = useState('Home');
-    // const ref = useRef(null);
-
-    // useEffect(() => {
-    //     ref.current.ownerDocument.body.scrollTop = 0;
-    // }, [selectedNavIndex]);
-
+    
     const TopNavComponents = {
         'home': HomeIcon,
         'explore': ExploreIcon,
@@ -62,9 +56,8 @@ const Navbar = (props) => {
                                 }}
                                 // onClick={() => setSelectedNavIndex(text)}
                             >
-                                {/* {selectedNavIndex === text ? <Icon selected /> : <Icon />}
-                                 */}
-                                 <Icon />
+                                 {props.page === text ? <Icon selected /> : <Icon />}
+    
                                 <ListItemText primary={text.charAt(0).toUpperCase() + text.slice(1)}
                                     sx={{
                                         marginLeft: '1.25rem',
@@ -79,24 +72,26 @@ const Navbar = (props) => {
 
             <List>
                 {Object.entries(BottomNavComponents).map(([text, Icon]) => (
-                    <ListItem key={text} disablePadding>
-                        <ListItemButton
-                            sx={{
-                                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }, borderRadius: '12px', padding: '0.5rem',
-                                margin: '0 0.25rem'
-                            }}
-                            // onClick={() => setSelectedNavIndex(text)}
-                        >
-                            {props.page === text ? <Icon selected /> : <Icon />}
-                            <Icon />
-                            <ListItemText primary={text.charAt(0).toUpperCase() + text.slice(1)}
+                    <Link href={`/${text.toLowerCase()}`} key={text}>
+                        <ListItem key={text} disablePadding>
+                            <ListItemButton
                                 sx={{
-                                    marginLeft: '1.25rem',
-                                    '& .MuiListItemText-primary': { fontSize: '1.15rem' }
+                                    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }, borderRadius: '12px', padding: '0.5rem',
+                                    margin: '0 0.25rem'
                                 }}
-                            />
-                        </ListItemButton>
-                    </ListItem>
+                                // onClick={() => setSelectedNavIndex(text)}
+                            >
+                                {props.page === text ? <Icon selected /> : <Icon />}
+
+                                <ListItemText primary={text.charAt(0).toUpperCase() + text.slice(1)}
+                                    sx={{
+                                        marginLeft: '1.25rem',
+                                        '& .MuiListItemText-primary': { fontSize: '1.15rem' }
+                                    }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
                 ))}
             </List>
         </>

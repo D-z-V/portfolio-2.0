@@ -16,6 +16,7 @@ import localFont from 'next/font/local';
 import CircularProgress from '@mui/material/CircularProgress';
 import NextTopLoader from 'nextjs-toploader';
 import Typography from '@mui/material/Typography';
+import DesktopStories from '@/components/DesktopStories';
 
 const drawerWidth = 240;
 
@@ -131,7 +132,7 @@ export default function Home() {
                   component="main"
                   sx={{ flexGrow: 1, p: 1.5, width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white' }}
                 >
-                      <Stories width = {size.width} />
+                      <DesktopStories />
                       <Posts mobile />
                 </Box>
               )}

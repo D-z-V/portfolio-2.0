@@ -5,29 +5,47 @@ import React, { useEffect } from 'react';
 
 import ListItemButton from '@mui/material/ListItemButton';
 
-import dynamicStory from './dynamicStory.gif';
-import staticStory from './staticStory.png';
+import dynamicStory from '../Stories/dynamicStory.gif';
+import staticStory from '../Stories/staticStory.png';
 
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-import Story from '@/components/Stories/Story';
+import Story from '@/components/DesktopStories/Story';
+import Modal from '@mui/material/Modal';
 
-const Stories = (props) => {
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+
+import Fade from '@mui/material/Fade';
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 520,
+    border: 'none',
+    boxShadow: 24,
+  };
+
+const DesktopStories = (props) => {
   const [activeIndex, setActiveIndex] = React.useState(null);
-  const [iconPosition, setIconPosition] = React.useState({ top: 0, left: 0 });
   const [stories, setStories] = React.useState([]);
   const [animationIndex, setAnimationIndex] = React.useState(null);
+  const [modal , setModal] = React.useState(false);
 
   const handleStoryClick = (index, position) => {
     if (index === activeIndex) {
       setActiveIndex(null);
     } else {
       if (stories[index].viewed) {
+        setModal(true);
         setActiveIndex(index);
         return;
       }
       setAnimationIndex(index);
       setTimeout(() => {
+        setModal(true);
         setActiveIndex(index);
         const newStories = [...stories];
         newStories[index].viewed = true;
@@ -35,7 +53,6 @@ const Stories = (props) => {
         setStories(newStories);
       }, 3000);
     }
-    setIconPosition(position);
   };
 
   useEffect(() => {
@@ -193,13 +210,8 @@ const Stories = (props) => {
           <Box key={index} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <ListItemButton
               key={index}
-              onClick={(event) => {
-                const rect = event.currentTarget.getBoundingClientRect();
-                const position = {
-                  top: rect.top + window.scrollY,
-                  left: rect.left + window.scrollX,
-                };
-                handleStoryClick(index, position);
+              onClick={() => {
+                handleStoryClick(index,);
               }}
 
               // onTouchEnd={
@@ -335,13 +347,24 @@ const Stories = (props) => {
           </Box>
         ))}
       </Box>
-
-      {activeIndex !== null && <Story top={iconPosition.top} left={iconPosition.left}
-        setActiveIndex={setActiveIndex}
-
-        clicked />}
+    
+      <Modal
+        open={modal}
+        onClose={() => setModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Fade in={modal}>
+            <Box sx={style}>
+                <Story stories={stories}/>
+                <IconButton aria-label="close" sx={{ color: 'white', position: 'absolute', top: '1rem', right: '1rem', zIndex: '9999' }} onClick={() => setModal(false)}>
+                    <CloseIcon height={32} width={32} />
+                </IconButton>
+            </Box>
+        </Fade>
+      </Modal>
     </>
   );
 };
 
-export default Stories;
+export default DesktopStories;

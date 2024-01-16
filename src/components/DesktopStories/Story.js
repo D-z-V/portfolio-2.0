@@ -8,8 +8,6 @@ import { useWindowSize } from "@uidotdev/usehooks";
 import Stories from 'stories-react';
 import 'stories-react/dist/index.css';
 
-const animationTime = 0.15;
-
 function Head(props) {
     return (
       <div
@@ -134,57 +132,10 @@ function Head(props) {
   ];
   
 const Story = (props) => {
-
-    const [clicked, setClicked] = useState(props.clicked);
-    const [animation, setAnimation] = useState([props.top + 50, props.left + 50]);
-
-    const storyAnimation = keyframes`
-                0% { height: 0; width: 0; top: ${props.top + 50}; left: ${props.left + 50}; }
-                100% { top: 0; left: 0; height: 100vh; width: 100vw; }
-        `;
-
-
-    if (props.clicked) {
-        setTimeout(() => {
-            setAnimation([0, 0]);
-        }, animationTime * 700);
-    }
-
-    const handleClose = () => {
-        setClicked(false);
-        props.setActiveIndex(null);
-
-    };
-
     return (
         <>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <Box
-                sx={{
-                    backgroundColor: 'black',
-                    height: '100vh',
-                    position: 'absolute',
-                    width: '100vw',
-                    top: animation[0],
-                    left: animation[1],
-                    zIndex: '9998',
-                    display: clicked ? 'block' : 'none',
-                    animation: `${storyAnimation} ${animationTime}s ease-in`,
-                    maxHeight: '100vh',
-                    maxWidth: '900px',
-                }}
-                className="scene"
-            >
-                 <Stories stories={stories} />
-                <IconButton aria-label="close" sx={{ color: 'white', position: 'absolute', top: '1rem', right: '1rem', zIndex: '9999' }} onClick={handleClose}
-
-                    onTouchEnd={handleClose}
-                >
-
-                    <CloseIcon height={32} width={32} />
-                </IconButton>
-            </Box>
-        </Box>
+          <Stories stories={stories} />
+      
         </>
     )
 }

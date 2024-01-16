@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import Grid from '@/components/Grid';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Resume from '@/components/Resume';
+import DesktopStories from '@/components/DesktopStories';
 
 const drawerWidth = 240;
 
@@ -53,7 +54,7 @@ function TabPanel(props) {
     value: PropTypes.number.isRequired,
   };
 
-const profile = () => {
+const Profile = () => {
 
     const [value, setValue] = React.useState(0);
 
@@ -141,7 +142,7 @@ const profile = () => {
                             <Typography variant="body1" sx={{ color: 'white', fontSize: "1rem", fontWeight: 600, mx: "0.75rem" }}>Dev Bhandari</Typography>
                             <Typography variant="body1" sx={{ color: 'white', fontSize: "1rem",  mx: "0.75rem" }}>Schlumbeger | NIT Trichy ✨</Typography>
                             <Button variant="contained" sx={{ color: 'white',  height: "2.25rem", borderRadius: "0.5rem", m: "0.5rem", my: '0.75rem' }}>Download Resume</Button>
-                            <Stories viewed />
+                            <Stories />
 
                             <Tabs value={value} onChange={handleChange}
                                 variant="fullWidth"
@@ -216,7 +217,7 @@ const profile = () => {
 
                             </Box>
                         </Box>
-                        <Stories viewed />
+                        <DesktopStories />
                         <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.3)', mx: "3.5rem", my: "2.5rem", mb: 0 }} />
                         <Box sx={{ width: '100%', backgroundColor: 'black', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', mx: "2rem" }}>
                             <Tabs value={value} onChange={handleChange} centered
@@ -283,4 +284,4 @@ const profile = () => {
     )
 }
 
-export default profile;
+export default Profile;
