@@ -89,7 +89,7 @@ const Story = (props) => {
   if (props.clicked) {
     setTimeout(() => {
       setAnimation([0, 0]);
-    }, animationTime * 1000);
+    }, animationTime * 900);
     setTimeout(() => {
       setAnimationDone(true);
     }, animationTime * 1000 + 200);
