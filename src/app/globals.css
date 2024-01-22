@@ -227,6 +227,46 @@ img {
   transform: rotateY(180deg) translateZ(50vw);
 } */
 
+
+.scene {
+  perspective: 300vw;
+  width: 100vw;
+  height: 100vh;
+
+ }
+ 
+ .cube {
+  position: relative;
+  width: inherit;
+  height: inherit;
+  transform-style: preserve-3d;
+  transition: transform 1s ease-in-out;
+ }
+ 
+ .cube__face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+ }
+ 
+ .cube__face--1 {
+  transform: rotateY(0deg) translateZ(50vw);
+ }
+ 
+ .cube__face--2 {
+  transform: rotateY(90deg) translateZ(50vw);
+ }
+ 
+ .cube__face--3 {
+  transform: rotateY(180deg) translateZ(50vw);
+ }
+ 
+ .cube__face--4 {
+  transform: rotateY(270deg) translateZ(50vw);
+ }
+
 .MuiLinearProgress-bar1Determinate {
   background-color: #8a8484 !important;
 }

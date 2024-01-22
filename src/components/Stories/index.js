@@ -11,6 +11,7 @@ import staticStory from './staticStory.png';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import Story from '@/components/Stories/Story';
+import { useWindowSize } from "@uidotdev/usehooks";
 
 const Stories = (props) => {
   const [activeIndex, setActiveIndex] = React.useState(null);
@@ -24,6 +25,7 @@ const Stories = (props) => {
     } else {
       if (stories[index].viewed) {
         setActiveIndex(index);
+        setIconPosition(position);
         return;
       }
       setAnimationIndex(index);
@@ -109,6 +111,9 @@ const Stories = (props) => {
       setStories(JSON.parse(localStorage.getItem('stories')));
     }
   }, []);
+
+  const size = useWindowSize();
+
 
   return (
     <>

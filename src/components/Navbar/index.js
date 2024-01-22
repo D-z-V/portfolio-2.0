@@ -124,11 +124,14 @@ const Navbar = (props) => {
                 <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 2 }} elevation={3}>
                     <BottomNavigation sx={{ backgroundColor: 'black' }}>
                         {Object.entries(TopNavComponents).map(([text, Icon]) => (
-                            <Link href={text == 'home' ? '/' : `/${text.toLowerCase()}`} key={text} style={{ width: '100%' }}>
+                            <Link href={text == 'home' ? '/' : `/${text.toLowerCase()}`} key={text} style={{ width: '100%',
+                                display: 'flex', justifyContent: 'center', alignItems: 'center'
+                            }}>
                                 <BottomNavigationAction key={text} label={text} icon={props.page === text ? <Icon selected /> : <Icon />}
                                     sx={{
                                         color: 'white',
                                         paddingX: '0rem',
+    
                                     }}
                                     // onClick={() => setSelectedNavIndex(text)}
                                 />

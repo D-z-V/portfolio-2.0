@@ -26,6 +26,7 @@ const style = {
     width: 520,
     border: 'none',
     boxShadow: 24,
+    height: '90vh',
   };
 
 const DesktopStories = (props) => {
