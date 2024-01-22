@@ -12,7 +12,7 @@ const WithSeeMore = React.lazy(() =>
 );
 
 
-const animationTime = 0.2;
+const animationTime = 0.15;
 
 
 const stories = [
@@ -89,10 +89,10 @@ const Story = (props) => {
   if (props.clicked) {
     setTimeout(() => {
       setAnimation([0, 0]);
-    }, animationTime * 900);
+    }, animationTime * 800);
     setTimeout(() => {
       setAnimationDone(true);
-    }, animationTime * 1000 + 200);
+    }, animationTime * 800 + 200);
   }
 
   const handleClose = () => {
