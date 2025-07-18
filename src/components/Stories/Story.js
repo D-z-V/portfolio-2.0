@@ -87,8 +87,23 @@ const Story = (props) => {
   const overlayTranslateY = useTransform(overlayProgress, [0, 1], [100, 0]);
   
   // Reply icon animation for horizontal navigation
-  const replyIconRotation = useTransform(x, [-window.innerWidth, 0, window.innerWidth], [-30, 0, 30]);
-  const replyIconOpacity = useTransform(x, [-window.innerWidth * 0.3, 0, window.innerWidth * 0.3], [0.3, 1, 0.3]);
+  const [windowWidth, setWindowWidth] = useState(1000);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+      
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+  
+  const replyIconRotation = useTransform(x, [-windowWidth, 0, windowWidth], [-30, 0, 30]);
+  const replyIconOpacity = useTransform(x, [-windowWidth * 0.3, 0, windowWidth * 0.3], [0.3, 1, 0.3]);
   
   const controls = useAnimation();
 
@@ -255,6 +270,11 @@ const Story = (props) => {
     y.set(0); // Crucial reset
     x.set(0); // Reset x position too
   };
+
+  // Don't render during SSR
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
   return (
     <AnimatePresence onExitComplete={onExitComplete}>
