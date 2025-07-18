@@ -12,6 +12,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import Story from '@/components/Stories/Story';
 import { useWindowSize } from "@uidotdev/usehooks";
+import { motion } from 'framer-motion';
 
 const Stories = (props) => {
   const [activeIndex, setActiveIndex] = React.useState(null);
@@ -23,21 +24,27 @@ const Stories = (props) => {
     if (index === activeIndex) {
       setActiveIndex(null);
     } else {
-      if (stories[index].viewed) {
-        setActiveIndex(index);
-        setIconPosition(position);
-        return;
+      // Always allow opening the story, regardless of viewed status
+      setActiveIndex(index);
+      setIconPosition(position);
+      
+      // Mark as viewed if not already viewed
+      if (!stories[index].viewed) {
+        setAnimationIndex(index);
+        setTimeout(() => {
+          const newStories = [...stories];
+          newStories[index].viewed = true;
+          localStorage.setItem('stories', JSON.stringify(newStories));
+          setStories(newStories);
+        }, 3000);
       }
-      setAnimationIndex(index);
-      setTimeout(() => {
-        setActiveIndex(index);
-        const newStories = [...stories];
-        newStories[index].viewed = true;
-        localStorage.setItem('stories', JSON.stringify(newStories));
-        setStories(newStories);
-      }, 3000);
     }
-    setIconPosition(position);
+  };
+
+  const handleStoryClose = () => {
+    // Reset story state when dismissed
+    setActiveIndex(null);
+    setAnimationIndex(null);
   };
 
   useEffect(() => {
@@ -198,6 +205,7 @@ const Stories = (props) => {
           <Box key={index} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <ListItemButton
               key={index}
+              data-story-id={`story-${index}`}
               onClick={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
                 const position = {
@@ -206,18 +214,6 @@ const Stories = (props) => {
                 };
                 handleStoryClick(index, position);
               }}
-
-              // onTouchEnd={
-              //   (event) => {
-              //     const rect = event.currentTarget.getBoundingClientRect();
-              //     const position = {
-              //       top: rect.top + window.scrollY,
-              //       left: rect.left + window.scrollX,
-              //     };
-              //     handleStoryClick(index, position);
-              //   }
-              // }
-
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -233,16 +229,16 @@ const Stories = (props) => {
             >
 
               {viewed ? (
-                <Box 
-                sx={{
-                  borderRadius: '50%',
-                  height: '65px',
-                  width: '65px',
-                  position: 'absolute',
-                  //a light white border around the image not solid white
-                  border: '2px solid rgba(255, 255, 255, 0.3)',
-                  padding: '0.17rem',
-                }}
+                <motion.div
+                  layoutId={`story-${index}`}
+                  style={{
+                    borderRadius: '50%',
+                    height: '65px',
+                    width: '65px',
+                    position: 'absolute',
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    padding: '0.17rem',
+                  }}
                 >
                 <Box
                   sx={{
@@ -261,22 +257,21 @@ const Stories = (props) => {
                     height={45}
                     style={{
                       position: 'absolute',
-                      // top: { md: '12%', sm: '10%' },
-                      // left: { md: '19%', sm: '17%' },
                       zIndex: '1',
                       clipPath: 'circle(50% at 50% 50%)',
                     }}
                   />
                 </Box>
-                </Box>
+                </motion.div>
               ) :
                 (
                   <>
                     {index === animationIndex ? (
                       <>
                         <Image src={dynamicStory} alt="dynamic story" width={75} height={75} />
-                        <Box
-                          sx={{
+                        <motion.div
+                          layoutId={`story-${index}`}
+                          style={{
                             backgroundColor: 'white',
                             borderRadius: '50%',
                             height: '60px',
@@ -292,19 +287,18 @@ const Stories = (props) => {
                             height={45}
                             style={{
                               position: 'absolute',
-                              // top: { md: '12%', sm: '10%' },
-                              // left: { md: '19%', sm: '17%' },
                               zIndex: '1',
                               clipPath: 'circle(50% at 50% 50%)',
                             }}
                           />
-                        </Box>
+                        </motion.div>
                       </>
                     ) : (
                       <>
                         <Image src={staticStory} alt="static story" width={75} height={75} />
-                        <Box
-                          sx={{
+                        <motion.div
+                          layoutId={`story-${index}`}
+                          style={{
                             backgroundColor: 'white',
                             borderRadius: '50%',
                             height: '60px',
@@ -320,15 +314,12 @@ const Stories = (props) => {
                             height={45}
                             style={{
                               position: 'absolute',
-                              // top: { md: '12%', sm: '10%' },
-                              // left: { md: '19%', sm: '17%' },
                               zIndex: '1',
                               clipPath: 'circle(50% at 50% 50%)',
                             }}
                           />
-                        </Box>
+                        </motion.div>
                       </>
-
                     )
                     }
                   </>
@@ -341,10 +332,13 @@ const Stories = (props) => {
         ))}
       </Box>
 
-      {activeIndex !== null && <Story top={iconPosition.top} left={iconPosition.left}
-        setActiveIndex={setActiveIndex}
-
-        clicked />}
+      <Story 
+        clicked={activeIndex !== null} 
+        setActiveIndex={handleStoryClose}
+        storyId={activeIndex !== null ? `story-${activeIndex}` : null}
+        top={iconPosition.top}
+        left={iconPosition.left}
+      />
     </>
   );
 };

@@ -68,35 +68,51 @@ const Reels = () => {
                 <CssBaseline />
 
               {size.width <= 900 ? (
-                    <Box sx={{ scrollSnapType: "y mandatory", backgroundColor: 'black', width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white'}}>
-                        <Box sx={{ scrollSnapAlign: "start" }}>
+                    <Box className="reels-container scroll-container" sx={{ backgroundColor: 'black', width: { md: `calc(100% - ${drawerWidth}px)` }, color: 'white'}}>
+                        <Box className="reel-item">
                             <Reel start reelLink="https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName="Cyberpunk II" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
                         </Box>
-                        <Box sx={{ scrollSnapAlign: "start" }}>
+                        <Box className="reel-item">
                             <Reel reelLink="https://i.ibb.co/X5mFqVj/giphy-1.gif" userName="Nyan Cat" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
                         </Box>
-                        <Box sx={{ scrollSnapAlign: "start" }}>
+                        <Box className="reel-item">
                             <Reel reelLink="https://i.ibb.co/YcwyndY/giphy.gif" userName="I See You" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
                         </Box>
-                        <Box sx={{ scrollSnapAlign: "start" }}>
+                        <Box className="reel-item">
                             <Reel reelLink="https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName="Cyberpunk II" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
                         </Box>
                     </Box>
 
               ) : (
 
-                <Box sx={{ scrollSnapType: "y mandatory", backgroundColor: 'black', width: { md: `calc(100% - ${drawerWidth}px)` }, height: { md: `calc(100vh - 64px)` }, backgroundColor: 'black', color: 'white', ml : { md: `${drawerWidth}px` }  }}>
-                    <Box sx={{ scrollSnapAlign: "start" }}>
-                        <Reel start reelLink="https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName="Cyberpunk II" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
-                    </Box>
-                    <Box sx={{ scrollSnapAlign: "start" }}>
-                        <Reel reelLink="https://i.ibb.co/X5mFqVj/giphy-1.gif" userName="Nyan Cat" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
-                    </Box>
-                    <Box sx={{ scrollSnapAlign: "start" }}>
-                        <Reel reelLink="https://i.ibb.co/YcwyndY/giphy.gif" userName="I See You" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
-                    </Box>
-                    <Box sx={{ scrollSnapAlign: "start" }}>
-                        <Reel reelLink="https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName="Cyberpunk II" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
+                <Box className="reels-container scroll-container" sx={{ 
+                    backgroundColor: 'black', 
+                    width: { md: `calc(100% - ${drawerWidth}px)` }, 
+                    color: 'white', 
+                    ml: { md: `${drawerWidth}px` },
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <Box sx={{ 
+                        maxWidth: '500px', 
+                        width: '100%', 
+                        height: '100vh',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        <Box className="reel-item">
+                            <Reel start reelLink="https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName="Cyberpunk II" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
+                        </Box>
+                        <Box className="reel-item">
+                            <Reel reelLink="https://i.ibb.co/X5mFqVj/giphy-1.gif" userName="Nyan Cat" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
+                        </Box>
+                        <Box className="reel-item">
+                            <Reel reelLink="https://i.ibb.co/YcwyndY/giphy.gif" userName="I See You" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
+                        </Box>
+                        <Box className="reel-item">
+                            <Reel reelLink="https://i.ibb.co/x7qZ9mw/giphy-3.gif" userName="Cyberpunk II" profilePic="https://i.ibb.co/tL1dnMC/77086465-113941020067774-8405997317559156736-n-modified.png" />
+                        </Box>
                     </Box>
                 </Box>
 
@@ -112,5 +128,3 @@ const Reels = () => {
 }
 
 export default Reels;
-
-

@@ -38,22 +38,30 @@ const DesktopStories = (props) => {
   const handleStoryClick = (index, position) => {
     if (index === activeIndex) {
       setActiveIndex(null);
+      setModal(false);
     } else {
-      if (stories[index].viewed) {
-        setModal(true);
-        setActiveIndex(index);
-        return;
+      // Always allow opening the story, regardless of viewed status
+      setModal(true);
+      setActiveIndex(index);
+      
+      // Mark as viewed if not already viewed
+      if (!stories[index].viewed) {
+        setAnimationIndex(index);
+        setTimeout(() => {
+          const newStories = [...stories];
+          newStories[index].viewed = true;
+          localStorage.setItem('stories', JSON.stringify(newStories));
+          setStories(newStories);
+        }, 3000);
       }
-      setAnimationIndex(index);
-      setTimeout(() => {
-        setModal(true);
-        setActiveIndex(index);
-        const newStories = [...stories];
-        newStories[index].viewed = true;
-        localStorage.setItem('stories', JSON.stringify(newStories));
-        setStories(newStories);
-      }, 3000);
     }
+  };
+
+  const handleStoryClose = () => {
+    // Reset story state when dismissed
+    setActiveIndex(null);
+    setAnimationIndex(null);
+    setModal(false);
   };
 
   useEffect(() => {
@@ -357,10 +365,7 @@ const DesktopStories = (props) => {
       >
         <Fade in={modal}>
             <Box sx={style}>
-                <Story stories={stories}/>
-                <IconButton aria-label="close" sx={{ color: 'white', position: 'absolute', top: '1rem', right: '1rem', zIndex: '9999' }} onClick={() => setModal(false)}>
-                    <CloseIcon height={32} width={32} />
-                </IconButton>
+                <Story onClose={() => setModal(false)} />
             </Box>
         </Fade>
       </Modal>

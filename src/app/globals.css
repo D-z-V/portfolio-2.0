@@ -81,21 +81,11 @@ html,
 body {
   max-width: 100vw;
   -webkit-tap-highlight-color:transparent;
-  scroll-snap-type: y mandatory;
+  /* scroll-snap-type: y mandatory; */ /* Removed from body to be applied on containers */
   background-color: black;
   background: black !important;
-
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
-
-/* body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-} */
 
 a {
   color: inherit;
@@ -108,16 +98,233 @@ a {
   }
 }
 
-.stories {
-  -ms-overflow-style: none;
-  /* for Internet Explorer, Edge */
-  scrollbar-width: none;
-  /* for Firefox */
-  }
+/* Generic Scroll Container Styling */
+.scroll-container {
+  -webkit-overflow-scrolling: touch; /* Momentum-based scrolling on iOS */
+  scrollbar-width: none; /* for Firefox */
+  -ms-overflow-style: none;  /* for Internet Explorer, Edge */
+}
 
-.stories::-webkit-scrollbar {
-  display: none;
-  /* for Chrome, Safari, and Opera */
+.scroll-container::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
+}
+
+
+/* Instagram Stories Scroll Behavior */
+.stories-container, .stories {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* for Firefox */
+  -ms-overflow-style: none;  /* for Internet Explorer, Edge */
+}
+
+.story-item {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+}
+
+.stories-container::-webkit-scrollbar, .stories::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
+}
+
+
+/* Instagram Reels Scroll Behavior */
+.reels-container {
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
+}
+
+.reel-item {
+  height: 100vh;
+  width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always; /* Prevents skipping over reels */
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+/* Enhanced 3D Cube Styles with faster animations */
+.scene {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+  overflow: hidden;
+  touch-action: pan-y; /* Allow vertical scrolling, handle horizontal ourselves */
+}
+
+.cube {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Faster, snappier transition */
+}
+
+.cube__face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  will-change: transform, opacity;
+  transition: opacity 0.15s ease; /* Faster opacity transitions */
+}
+
+/* Story viewer container styles with full viewport coverage */
+.story-viewer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 9998;
+  touch-action: pan-y;
+  overflow: hidden;
+  /* Ensure full viewport coverage */
+  max-width: 100vw;
+  max-height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+/* FLIP animation styles with immediate full-screen expansion */
+.story-viewer--entering {
+  transform-origin: center;
+  transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              border-radius 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Immediate full-screen expansion */
+}
+
+/* Elastic snap dismiss gesture */
+.story-viewer--dismissing {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              scale 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Ensure full viewport coverage during dismiss */
+  width: 100vw;
+  height: 100vh;
+  opacity: 1; /* Keep full opacity until threshold */
+}
+
+/* Elastic snap back animation */
+.story-viewer--snapping-back {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              scale 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Reduced motion support for all story animations */
+@media (prefers-reduced-motion: reduce) {
+  .cube,
+  .cube__face,
+  .story-viewer--entering,
+  .story-viewer--dismissing,
+  .story-viewer--snapping-back {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .scene {
+    perspective: none;
+  }
+  
+  .cube {
+    transform-style: flat;
+  }
+}
+
+/* Performance optimizations */
+.story {
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+}
+
+.story:hover {
+  transform: scale(0.95);
+}
+
+.story:active {
+  transform: scale(0.9);
+}
+
+/* Smooth animations */
+.cube, .cube__face {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* Hardware acceleration */
+.cube, .cube__face, .story {
+  transform: translateZ(0);
+}
+
+/* Touch handling improvements */
+.story-viewer * {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Close button enhancements with faster interactions */
+.story-close-button {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  transition: background-color 0.1s ease; /* Faster button transitions */
+}
+
+.story-close-button:hover {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Story navigation indicators */
+.story-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.3);
+  z-index: 10000;
+}
+
+.story-progress-bar {
+  height: 100%;
+  background-color: white;
+  transition: width 0.1s linear;
+}
+
+/* Keyboard navigation focus styles */
+.story-viewer:focus {
+  outline: none;
+}
+
+.story-viewer:focus-visible {
+  outline: 2px solid #0093f1;
+  outline-offset: 2px;
 }
 
 .heartIcon {
@@ -165,107 +372,11 @@ img {
 
 @keyframes doubleTap {
   0% { transform: translate(-50%, -50%) scale(0); opacity: 100; }
-  /* 50% { transform: translate(-50%, -50%) scale(1); } */
   25% { transform: translate(-50%, -50%) scale(1);  opacity: 100; }
   60% { transform: translate(-50%, -50%) scale(0.8);  opacity: 100; }
-  /* 80% { transform: translate(-50%, -50%) scale(1.3);  opacity: 100; } */
   80% { transform: translate(-50%, -50%) scale(0.8);  opacity: 100; }
   100% { transform: translate(-50%, -50%) scale(0);  opacity: 0; }
 }
-
-/* .story {
-  animation: story 0.5s ease-in;
-}
-
-/* make top = 0, left = 0 and height and width full screen  */
-
-/* @keyframes story {
-  0% { height: 0; width: 0;}
-  100% { top: 0; left: 0; height: 100vh; width: 100vw; 
-  }
-} */ 
-
-/* .scene {
-  perspective: 300vw;
-  width: 100vw;
-  --rotatePercent: 0;
-  position: absolute;
-}
-
-.cube {
-  position: relative;
-  width: inherit;
-  height: inherit;
-  transform-style: preserve-3d;
-  transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
-}
-
-.cube.transition {
-  transition: transform .25s;
-}
-
-.face {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: inherit;
-  height: inherit;
-  background-repeat: no-repeat;
-
-}
-
-
-.face-left {
-  transform: rotateY(0deg) translateZ(50vw);
-}
-
-.face-front {
-  transform: rotateY(90deg) translateZ(50vw);
-}
-
-.face-right {
-  transform: rotateY(180deg) translateZ(50vw);
-} */
-
-
-.scene {
-  perspective: 300vw;
-  width: 100vw;
-  height: 100vh;
-
- }
- 
- .cube {
-  position: relative;
-  width: inherit;
-  height: inherit;
-  transform-style: preserve-3d;
-  transition: transform 1s ease-in-out;
- }
- 
- .cube__face {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: inherit;
-  height: inherit;
- }
- 
- .cube__face--1 {
-  transform: rotateY(0deg) translateZ(50vw);
- }
- 
- .cube__face--2 {
-  transform: rotateY(90deg) translateZ(50vw);
- }
- 
- .cube__face--3 {
-  transform: rotateY(180deg) translateZ(50vw);
- }
- 
- .cube__face--4 {
-  transform: rotateY(270deg) translateZ(50vw);
- }
 
 .MuiLinearProgress-bar1Determinate {
   background-color: #8a8484 !important;
@@ -297,4 +408,252 @@ img {
   100% {
     background-position: 100% 50%;
   }
+}
+
+/* Story item specific styles */
+.story-item {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+  margin-right: 15px;
+}
+
+/* Enhanced touch handling for story elements with better responsiveness */
+.story {
+  transition: transform 0.1s ease-out; /* Faster hover/active transitions */
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Ensure proper touch handling on all devices */
+  touch-action: manipulation;
+}
+
+.story:hover {
+  transform: scale(0.95);
+}
+
+.story:active {
+  transform: scale(0.9);
+}
+
+/* Focus styles for keyboard navigation */
+.story:focus-visible {
+  outline: 2px solid #0093f1;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Story viewer accessibility improvements with full viewport coverage */
+.story-viewer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 9998;
+  touch-action: pan-y;
+  overflow: hidden;
+  /* Ensure full viewport constraints */
+  max-width: 100vw;
+  max-height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+.story-viewer:focus {
+  outline: none;
+}
+
+.story-viewer:focus-visible {
+  outline: 2px solid #0093f1;
+  outline-offset: 2px;
+}
+
+/* Progress indicator for story navigation with faster updates */
+.story-progress-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  z-index: 10000;
+  display: flex;
+  gap: 2px;
+  padding: 8px;
+}
+
+.story-progress-bar {
+  height: 100%;
+  background-color: white;
+  border-radius: 2px;
+  transition: width 0.05s linear; /* Faster progress updates */
+  flex: 1;
+}
+
+.story-progress-bar.completed {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Navigation controls with improved responsiveness */
+.story-nav-controls {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10001;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 20px;
+  pointer-events: none;
+}
+
+.story-nav-button {
+  pointer-events: auto;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.1s ease; /* Faster button transitions */
+}
+
+.story-nav-button:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.story-nav-button:focus-visible {
+  outline: 2px solid #0093f1;
+  outline-offset: 2px;
+}
+
+/* Loading states with faster appearance */
+.story-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  z-index: 10002;
+  transition: opacity 0.15s ease; /* Faster loading transitions */
+}
+
+/* Error states with improved responsiveness */
+.story-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: center;
+  z-index: 10002;
+}
+
+/* Reduced motion support for all story animations */
+@media (prefers-reduced-motion: reduce) {
+  .story,
+  .story-viewer,
+  .cube,
+  .cube__face,
+  .story-nav-button {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .story:hover,
+  .story:active {
+    transform: none !important;
+  }
+  
+  .scene {
+    perspective: none;
+  }
+  
+  .cube {
+    transform-style: flat;
+  }
+}
+
+/* High contrast mode support with better responsiveness */
+@media (prefers-contrast: high) {
+  .story-close-button,
+  .story-nav-button {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid white;
+  }
+  
+  .story-progress-bar {
+    background-color: white;
+    border: 1px solid black;
+  }
+}
+
+/* Responsive viewport handling for different screen sizes with full coverage */
+@media (max-width: 768px) {
+  .story-viewer {
+    /* Ensure full mobile viewport coverage */
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    min-width: 100vw;
+    min-height: 100vh;
+  }
+  
+  .cube {
+    /* Adjust 3D perspective for smaller screens */
+    transform-style: preserve-3d;
+  }
+}
+
+@media (min-width: 769px) {
+  .story-viewer {
+    /* Desktop optimizations with full coverage */
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+  }
+}
+
+/* Elastic snap dismiss gesture support */
+.story-viewer-dismiss {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 9998;
+  transform: translateY(0);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 1; /* Keep full opacity during drag */
+}
+
+.story-viewer-dismiss.dismissing {
+  transform: translateY(100vh);
+  opacity: 0;
+  scale: 0.8;
+}
+
+/* Elastic snap back animation */
+.story-viewer-dismiss.snapping-back {
+  transform: translateY(0);
+  opacity: 1;
+  scale: 1;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              scale 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
