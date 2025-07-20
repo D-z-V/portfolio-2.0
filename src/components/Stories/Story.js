@@ -1,119 +1,97 @@
-import { Box, Button, IconButton, Typography, TextField } from "@mui/material";
-import { keyframes } from '@mui/system';
+import { Box, IconButton } from "@mui/material";
 import React, { useEffect, useState, lazy, Suspense, useRef } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import ReplyIcon from '@mui/icons-material/Reply';
-import SendIcon from '@mui/icons-material/Send';
 import { motion, useMotionValue, useTransform, AnimatePresence, useAnimation } from 'framer-motion';
 
 const StoriesLazy = React.lazy(() => import("react-insta-stories"));
-const WithSeeMore = React.lazy(() =>
-  import("react-insta-stories").then((module) => ({
-    default: module.WithSeeMore,
-  }))
-);
-
-const animationTime = 0.15;
 
 const stories = [
   {
     url: 'https://picsum.photos/1080/1920',
     duration: 5000,
     header: {
-      heading: 'Mohit Karekar',
+      heading: 'NextJS',
       subheading: 'Posted 30m ago',
-      profileImage: 'https://picsum.photos/100/100',
+      profileImage: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg',
     },
   },
   {
     url: 'https://picsum.photos/1280/1920',
     duration: 5000,
     header: {
-      heading: 'Mohit Karekar',
+      heading: 'ReactJS',
       subheading: 'Posted 30m ago',
-      profileImage: 'https://picsum.photos/100/100',
+      profileImage: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg',
     },
   },
   {
     url: 'https://picsum.photos/1180/1920',
     duration: 5000,
     header: {
-      heading: 'Mohit Karekar',
+      heading: 'NodeJS',
       subheading: 'Posted 30m ago',
-      profileImage: 'https://picsum.photos/100/100',
+      profileImage: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg',
     },
   },
   {
     url: 'https://picsum.photos/1480/1920',
     duration: 5000,
     header: {
-      heading: 'Mohit Karekar',
+      heading: 'MongoDB',
       subheading: 'Posted 30m ago',
-      profileImage: 'https://picsum.photos/100/100',
+      profileImage: 'https://upload.wikimedia.org/wikipedia/commons/9/93/MongoDB_Logo.svg',
     },
   },
   {
     url: 'https://picsum.photos/1080/1920',
     duration: 5000,
     header: {
-      heading: 'Mohit Karekar',
+      heading: 'PyTorch',
       subheading: 'Posted 30m ago',
-      profileImage: 'https://picsum.photos/100/100',
+      profileImage: 'https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg',
     },
   },
 ];
 
 const Story = (props) => {
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
-  const [overlayState, setOverlayState] = useState('CLOSED'); // 'CLOSED' | 'OPENING' | 'OPEN' | 'CLOSING'
-  const [messageText, setMessageText] = useState('');
-
+  const [isDragging, setIsDragging] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isVerticalMovement, setIsVerticalMovement] = useState(false);
+  
   // Motion values for animations
-  const rotationY = useMotionValue(0);
-  const baseRotation = useRef(0);
   const y = useMotionValue(0);
   const x = useMotionValue(0);
   
   const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
   
-  // Enhanced visual feedback for a more "elastic" feel with non-linear mapping
-  const scale = useTransform(y, [0, viewportHeight * 0.3, viewportHeight], [1, 0.8, 0.6]);
-  const opacity = useTransform(y, [0, viewportHeight * 0.4, viewportHeight], [1, 0.6, 0.1]);
-  const borderRadius = useTransform(y, [0, viewportHeight * 0.2, viewportHeight / 2], ["0%", "25%", "50%"]);
-  
-  // Overlay animation values
-  const overlayProgress = useMotionValue(0);
-  const overlayOpacity = useTransform(overlayProgress, [0, 1], [0, 1]);
-  const overlayTranslateY = useTransform(overlayProgress, [0, 1], [100, 0]);
-  
-  // Reply icon animation for horizontal navigation
-  const [windowWidth, setWindowWidth] = useState(1000);
-  
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setWindowWidth(window.innerWidth);
-      
-      const handleResize = () => {
-        setWindowWidth(window.innerWidth);
-      };
-      
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
-  
-  const replyIconRotation = useTransform(x, [-windowWidth, 0, windowWidth], [-30, 0, 30]);
-  const replyIconOpacity = useTransform(x, [-windowWidth * 0.3, 0, windowWidth * 0.3], [0.3, 1, 0.3]);
+  // Remove scaling/opacity transforms during drag - keep component same size
+  // Only apply transforms when dismissing (after drag ends)
+  const scale = useTransform(y, [0, viewportHeight * 0.5, viewportHeight], [1, 0.9, 0.7]);
+  const opacity = useTransform(y, [0, viewportHeight * 0.6, viewportHeight], [1, 0.8, 0.3]);
+  const borderRadius = useTransform(y, [0, viewportHeight * 0.3, viewportHeight / 2], ["0%", "20%", "40%"]);
   
   const controls = useAnimation();
+  const horizontalControls = useAnimation();
 
   useEffect(() => {
     if (props.clicked) {
       document.body.style.overflow = 'hidden';
-      y.set(0); // Reset position on open
+      y.set(0);
       x.set(0);
-      rotationY.set(0);
       setActiveStoryIndex(0);
+      setIsLoading(true);
+      
+      // Set initial position for horizontal container
+      horizontalControls.set({
+        x: 0
+      });
+      
+      // Simulate loading completion after a short delay
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     }
     return () => {
       document.body.style.overflow = 'auto';
@@ -124,151 +102,298 @@ const Story = (props) => {
     props.setActiveIndex(null);
   };
 
-  const handlePanStart = (event, info) => {
-    baseRotation.current = activeStoryIndex * -90;
+  const handleDragStart = (event, info) => {
+    setIsDragging(true);
+    setIsVerticalMovement(false); // Reset vertical movement state
+    console.log('Drag start:', { x: info.point.x, y: info.point.y });
   };
 
-  const handlePan = (event, info) => {
-    // Prioritize vertical drag for dismissal, only allow horizontal pan if drag is mostly horizontal
-    if (Math.abs(info.offset.x) > Math.abs(info.offset.y)) {
-        const dragFactor = 0.6;
-        const newRotation = baseRotation.current + (info.offset.x * dragFactor);
-        rotationY.set(newRotation);
-    }
-  };
-
-  const handlePanEnd = (event, info) => {
-    if (Math.abs(info.offset.x) > Math.abs(info.offset.y)) {
-        const threshold = window.innerWidth * 0.25;
-        const velocity = info.velocity.x;
-        const offset = info.offset.x;
-        
-        let newIndex = activeStoryIndex;
-        
-        if (Math.abs(offset) > threshold || Math.abs(velocity) > 300) {
-          if (offset > 0 && activeStoryIndex > 0) {
-            newIndex = activeStoryIndex - 1;
-          } else if (offset < 0 && activeStoryIndex < stories.length - 1) {
-            newIndex = activeStoryIndex + 1;
-          }
-        }
-        
-        setActiveStoryIndex(newIndex);
-        
-        controls.start({
-          rotateY: newIndex * -90,
-          transition: { 
-            type: "spring", 
-            stiffness: 280, // Slightly softer for smoother transitions
-            damping: 25 // Less damping for more bounce
-          }
-        });
+  const handleDrag = (event, info) => {
+    // Detect vertical movement early during drag
+    const deltaX = info.offset.x;
+    const deltaY = info.offset.y;
+    const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (magnitude > 10) { // Only check after some movement
+      const cosVertical = Math.abs(deltaY) / magnitude;
+      const cosHorizontal = Math.abs(deltaX) / magnitude;
+      
+      // Detect vertical movement with a lower threshold (0.7) for early detection
+      const isVertical = cosVertical > 0.7 && cosHorizontal < 0.7;
+      
+      if (isVertical && !isVerticalMovement) {
+        setIsVerticalMovement(true);
+        console.log('Vertical movement detected during drag');
+      }
     }
   };
 
   const handleDragEnd = (event, info) => {
-    const dismissThreshold = viewportHeight * 0.2;
-    const flickVelocityThreshold = 600;
-    const upwardThreshold = viewportHeight * 0.2;
-    const upwardVelocityThreshold = -800;
+    setIsDragging(false);
+    setIsVerticalMovement(false); // Reset vertical movement state
+    
+    // Calculate the angle of movement using dot product
+    const deltaX = info.offset.x;
+    const deltaY = info.offset.y;
+    const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (magnitude === 0) return; // No movement
+    
+    // Calculate cosine of angle with vertical axis (0° = vertical, 90° = horizontal)
+    const cosVertical = Math.abs(deltaY) / magnitude;
+    const cosHorizontal = Math.abs(deltaX) / magnitude;
+    
+    // Much stricter vertical threshold - only consider it vertical if cos > 0.98
+    const isStrictlyVertical = cosVertical > 0.98;
+    
+    console.log('Vertical drag analysis:', { 
+      deltaX, 
+      deltaY, 
+      magnitude,
+      cosVertical,
+      cosHorizontal,
+      isStrictlyVertical
+    });
+    
+    // Only handle vertical dismiss if it's strictly vertical (cos > 0.98)
+    if (isStrictlyVertical && deltaY > 0) {
+      // Much more sensitive thresholds for vertical dismiss
+      const dismissThreshold = viewportHeight * 0.1; // Reduced from 0.2 to 0.1 (10% of screen)
+      const flickVelocityThreshold = 300; // Reduced from 600 to 300
+      const minDismissDistance = 50; // Minimum distance to dismiss
 
-    // Check for upward swipe (reply overlay)
-    if (info.offset.y < -upwardThreshold || info.velocity.y < upwardVelocityThreshold) {
-      // Trigger overlay opening
-      setOverlayState('OPENING');
-      controls.start({
-        overlayProgress: 1,
-        transition: { 
-          type: "spring",
-          stiffness: 300,
-          damping: 30,
-          duration: 0.35
+      if (deltaY > dismissThreshold || info.velocity.y > flickVelocityThreshold || deltaY > minDismissDistance) {
+        console.log('Dismissing story - sensitive vertical threshold met');
+        handleClose();
+      } else {
+        console.log('Snapping back - sensitive vertical threshold not met');
+        // Snap back to fullscreen
+        controls.start({
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          borderRadius: "0%",
+          transition: {
+            type: "spring",
+            stiffness: 450,
+            damping: 25,
+          }
+        });
+      }
+    } else {
+      // If not strictly vertical (cos < 0.98), treat as horizontal swipe
+      // Use the magnitude of the cosine for horizontal navigation
+      const horizontalMagnitude = cosHorizontal;
+      const threshold = viewportWidth * 0.3; // 30% threshold
+      const offset = deltaX * horizontalMagnitude; // Scale by horizontal component
+      
+      let newIndex = activeStoryIndex;
+      
+      // Only change story if threshold is met
+      if (Math.abs(offset) > threshold) {
+        if (offset > 0 && activeStoryIndex > 0) {
+          newIndex = activeStoryIndex - 1;
+        } else if (offset < 0 && activeStoryIndex < stories.length - 1) {
+          newIndex = activeStoryIndex + 1;
         }
-      }).then(() => {
-        setOverlayState('OPEN');
-        // Focus the input field
-        const inputField = document.getElementById('story-reply-input');
-        if (inputField) {
-          inputField.focus();
+      }
+      
+      console.log('Horizontal navigation from vertical drag:', { 
+        offset, 
+        threshold, 
+        horizontalMagnitude,
+        activeStoryIndex, 
+        newIndex,
+        willChange: newIndex !== activeStoryIndex 
+      });
+      
+      setActiveStoryIndex(newIndex);
+      
+      // Animate to the correct position
+      horizontalControls.start({
+        x: -newIndex * viewportWidth,
+        transition: { 
+          type: "spring", 
+          stiffness: 500,
+          damping: 30
         }
       });
-      return;
-    }
-
-    // Check for downward swipe (dismiss)
-    if (info.offset.y > dismissThreshold || info.velocity.y > flickVelocityThreshold) {
-      // --- TRIGGER EXIT ANIMATION ---
-      // Let Framer Motion handle the layoutId transition automatically
-      handleClose();
-    } else {
-      // --- SNAP-BACK TO FULLSCREEN ---
+      
+      // Also snap back vertical position
       controls.start({
         y: 0,
-        x: 0,
         scale: 1,
         opacity: 1,
         borderRadius: "0%",
         transition: {
           type: "spring",
-          stiffness: 350,
-          damping: 30,
+          stiffness: 450,
+          damping: 25,
         }
       });
     }
   };
 
-  const handleOverlayClose = () => {
-    setOverlayState('CLOSING');
-    controls.start({
-      overlayProgress: 0,
-      transition: { 
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-        duration: 0.25
-      }
-    }).then(() => {
-      setOverlayState('CLOSED');
-      setMessageText('');
+  const handleHorizontalDragEnd = (event, info) => {
+    setIsDragging(false);
+    setIsVerticalMovement(false); // Reset vertical movement state
+    
+    // If vertical movement was detected during drag, ignore horizontal navigation
+    if (isVerticalMovement) {
+      console.log('Ignoring horizontal navigation - vertical movement detected');
+      // Snap back to current position
+      horizontalControls.start({
+        x: -activeStoryIndex * viewportWidth,
+        transition: { 
+          type: "spring", 
+          stiffness: 500,
+          damping: 30
+        }
+      });
+      return;
+    }
+    
+    // Calculate the angle of movement using dot product
+    const deltaX = info.offset.x;
+    const deltaY = info.offset.y;
+    const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (magnitude === 0) return; // No movement
+    
+    // Calculate cosine of angle with horizontal axis
+    const cosHorizontal = Math.abs(deltaX) / magnitude;
+    const cosVertical = Math.abs(deltaY) / magnitude;
+    
+    // Consider it horizontal if it's more horizontal than vertical AND not strictly vertical
+    const isStrictlyVertical = cosVertical > 0.98;
+    const isHorizontal = cosHorizontal > cosVertical && !isStrictlyVertical;
+    
+    console.log('Horizontal drag analysis:', { 
+      deltaX, 
+      deltaY, 
+      magnitude,
+      cosHorizontal,
+      cosVertical,
+      isStrictlyVertical,
+      isHorizontal
     });
-  };
+    
+    // Handle horizontal navigation
+    if (isHorizontal) {
+      const threshold = viewportWidth * 0.3; // 30% threshold
+      const offset = deltaX;
+      
+      let newIndex = activeStoryIndex;
+      let willSnap = false;
+      
+      // Only change story if 30% is revealed
+      if (Math.abs(offset) > threshold) {
+        willSnap = true;
+        if (offset > 0 && activeStoryIndex > 0) {
+          newIndex = activeStoryIndex - 1;
+        } else if (offset < 0 && activeStoryIndex < stories.length - 1) {
+          newIndex = activeStoryIndex + 1;
+        }
+      }
+      
+      console.log('Horizontal navigation decision:', { 
+        offset, 
+        threshold, 
+        activeStoryIndex, 
+        newIndex,
+        willSnap,
+        willChange: newIndex !== activeStoryIndex 
+      });
+      
+      setActiveStoryIndex(newIndex);
+      
+      // Animate to the correct position
+      horizontalControls.start({
+        x: -newIndex * viewportWidth,
+        transition: { 
+          type: "spring", 
+          stiffness: 500,
+          damping: 30
+        }
+      });
+    } else if (isStrictlyVertical && deltaY > 0) {
+      // If it's strictly vertical and downward, handle as vertical dismiss
+      // Use the same sensitive thresholds as vertical drag
+      const dismissThreshold = viewportHeight * 0.1; // 10% of screen
+      const flickVelocityThreshold = 300; // Reduced velocity threshold
+      const minDismissDistance = 50; // Minimum distance to dismiss
 
-  const handleSendMessage = () => {
-    if (messageText.trim()) {
-      console.log('Sending message:', messageText);
-      // Here you would typically send the message to your backend
-      setMessageText('');
-      handleOverlayClose();
+      if (deltaY > dismissThreshold || info.velocity.y > flickVelocityThreshold || deltaY > minDismissDistance) {
+        console.log('Dismissing story from horizontal drag - sensitive vertical threshold met');
+        handleClose();
+      } else {
+        console.log('Snapping back from horizontal drag - sensitive vertical threshold not met');
+        // Snap back to fullscreen
+        controls.start({
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          borderRadius: "0%",
+          transition: {
+            type: "spring",
+            stiffness: 450,
+            damping: 25,
+          }
+        });
+      }
+    } else {
+      // If not clearly horizontal or vertical, snap back to current position
+      console.log('Snapping back - ambiguous movement');
+      horizontalControls.start({
+        x: -activeStoryIndex * viewportWidth,
+        transition: { 
+          type: "spring", 
+          stiffness: 500,
+          damping: 30
+        }
+      });
     }
   };
 
   const handleKeyDown = (event) => {
     if (event.key === 'Escape') {
-      if (overlayState === 'OPEN') {
-        handleOverlayClose();
-      } else {
-        handleClose();
-      }
+      handleClose();
     } else if (event.key === 'ArrowLeft' && activeStoryIndex > 0) {
-      setActiveStoryIndex(activeStoryIndex - 1);
+      const newIndex = activeStoryIndex - 1;
+      setActiveStoryIndex(newIndex);
+      horizontalControls.start({
+        x: -newIndex * viewportWidth,
+        transition: { 
+          type: "spring", 
+          stiffness: 500,
+          damping: 30
+        }
+      });
     } else if (event.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) {
-      setActiveStoryIndex(activeStoryIndex + 1);
+      const newIndex = activeStoryIndex + 1;
+      setActiveStoryIndex(newIndex);
+      horizontalControls.start({
+        x: -newIndex * viewportWidth,
+        transition: { 
+          type: "spring", 
+          stiffness: 500,
+          damping: 30
+        }
+      });
     }
   };
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [activeStoryIndex, overlayState]);
+  }, [activeStoryIndex]);
 
   const onExitComplete = () => {
-    // Reset all state after the exit animation is finished
     setActiveStoryIndex(0);
-    rotationY.set(0);
-    baseRotation.current = 0;
     controls.stop();
-    y.set(0); // Crucial reset
-    x.set(0); // Reset x position too
+    horizontalControls.stop();
+    y.set(0);
+    x.set(0);
   };
 
   // Don't render during SSR
@@ -279,89 +404,154 @@ const Story = (props) => {
   return (
     <AnimatePresence onExitComplete={onExitComplete}>
       {props.clicked && (
-        <motion.div
-          layoutId={props.storyId}
-          drag="y"
-          dragConstraints={{ top: 0, bottom: viewportHeight }}
-          dragElastic={{ top: 0.2, bottom: 0.8 }}
-          onDragEnd={handleDragEnd}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'black',
-            zIndex: 9998,
-            touchAction: 'none',
-            x,
-            y,
-            scale,
-            opacity,
-            borderRadius,
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-          }}
-          initial={{
-            borderRadius: "50%",
-            opacity: 0,
-            scale: 0.8,
-          }}
-          exit={{
-            borderRadius: "50%",
-            opacity: 0,
-            scale: 0.8,
-            transition: {
-              type: "spring",
-              stiffness: 200,
-              damping: 25,
-              duration: 0.4
-            }
-          }}
-          animate={controls}
-        >
+        <>
+          {/* Black background overlay */}
           <motion.div
-            className="scene"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             style={{
-              width: '100%',
-              height: '100%',
-              position: 'relative',
-              perspective: '1000px',
-              overflow: 'hidden',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'black',
+              zIndex: 9997, // Just below the story component
             }}
-            onPanStart={handlePanStart}
-            onPan={handlePan}
-            onPanEnd={handlePanEnd}
+          />
+          
+          <motion.div
+            layoutId={props.storyId}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: viewportHeight }}
+            dragElastic={{ top: 0.2, bottom: 0.8 }}
+            onDragStart={handleDragStart}
+            onDrag={handleDrag}
+            onDragEnd={handleDragEnd}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'black',
+              zIndex: 9998,
+              touchAction: 'none',
+              x: 0,
+              y,
+              // Only apply scaling/opacity when dismissing, not during drag
+              scale: isDragging ? 1 : scale,
+              opacity: isDragging ? 1 : opacity,
+              borderRadius: isDragging ? "0%" : borderRadius,
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+            }}
+            initial={{
+              borderRadius: "50%",
+              opacity: 0,
+              scale: 0.8,
+            }}
+            exit={{
+              borderRadius: "50%",
+              opacity: 0,
+              scale: 0.8,
+              transition: {
+                type: "spring",
+                stiffness: 300,
+                damping: 20,
+                duration: 0.25
+              }
+            }}
+            animate={controls}
           >
-            <motion.div
-              className="cube"
-              style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                transformStyle: 'preserve-3d',
-                rotateY: rotationY,
-              }}
-              animate={controls}
-            >
-              {stories.map((story, index) => (
-                <motion.div
-                  key={index}
-                  className="cube__face"
-                  style={{
-                    position: 'absolute',
-                    width: '100%',
+          {/* Horizontal Swipe Container */}
+          <motion.div
+            className="story-container"
+            style={{
+              width: `${stories.length * 100}vw`,
+              height: '100vh',
+              display: 'flex',
+              position: 'relative',
+            }}
+            drag={isVerticalMovement ? null : "x"}
+            dragConstraints={{
+              left: -(stories.length - 1) * viewportWidth,
+              right: 0
+            }}
+            dragElastic={0.1}
+            dragMomentum={false}
+            onDragStart={handleDragStart}
+            onDragEnd={handleHorizontalDragEnd}
+            animate={horizontalControls}
+          >
+            {stories.map((story, index) => (
+              <motion.div
+                key={index}
+                className="story-slide"
+                style={{
+                  width: '100vw',
+                  height: '100vh',
+                  flexShrink: 0,
+                  position: 'relative',
+                }}
+                animate={{ 
+                  opacity: index === activeStoryIndex ? 1 : 0.3,
+                  scale: index === activeStoryIndex ? 1 : 0.95
+                }}
+                transition={{ 
+                  duration: 0.2,
+                  ease: "easeInOut"
+                }}
+              >
+                <Suspense fallback={
+                  <div style={{ 
+                    backgroundColor: '#111', 
+                    width: '100%', 
                     height: '100%',
-                    backfaceVisibility: 'hidden',
-                    transform: `rotateY(${index * 90}deg) translateZ(50vw)`,
-                  }}
-                  animate={{ opacity: index === activeStoryIndex ? 1 : 0.3 }}
-                  transition={{ 
-                    duration: 0.4,
-                    ease: "easeInOut" // Smoother transitions between stories
-                  }}
-                >
-                  <Suspense fallback={<div style={{ backgroundColor: '#111', width: '100%', height: '100%' }} />}>
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '18px',
+                    flexDirection: 'column',
+                    gap: '1rem'
+                  }}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      border: '3px solid rgba(255,255,255,0.3)',
+                      borderTop: '3px solid white',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }}></div>
+                    Loading story...
+                  </div>
+                }>
+                  {isLoading ? (
+                    <div style={{ 
+                      backgroundColor: '#111', 
+                      width: '100%', 
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '18px',
+                      flexDirection: 'column',
+                      gap: '1rem'
+                    }}>
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        border: '3px solid rgba(255,255,255,0.3)',
+                        borderTop: '3px solid white',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }}></div>
+                      Loading story...
+                    </div>
+                  ) : (
                     <StoriesLazy
                       stories={[story]}
                       defaultInterval={5000}
@@ -371,162 +561,119 @@ const Story = (props) => {
                       loop={false}
                       isPaused={index !== activeStoryIndex}
                     />
-                  </Suspense>
-                  
-                  {/* Reply Icon - Takes the icon with you during horizontal navigation */}
-                  <motion.div
-                    style={{
-                      position: 'absolute',
-                      bottom: '2rem',
-                      right: '2rem',
-                      zIndex: 9999,
-                      rotate: replyIconRotation,
-                      opacity: replyIconOpacity,
-                    }}
-                  >
-                    <IconButton 
-                      aria-label="reply" 
-                      sx={{ 
-                        color: 'white', 
-                        backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                        }
-                      }} 
-                      onClick={() => {
-                        setOverlayState('OPENING');
-                        controls.start({
-                          overlayProgress: 1,
-                          transition: { 
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 30,
-                            duration: 0.35
-                          }
-                        }).then(() => {
-                          setOverlayState('OPEN');
-                          const inputField = document.getElementById('story-reply-input');
-                          if (inputField) {
-                            inputField.focus();
-                          }
-                        });
-                      }}
-                    >
-                      <ReplyIcon />
-                    </IconButton>
-                  </motion.div>
-                  
-                  <IconButton 
-                    aria-label="close" 
-                    sx={{ 
-                      color: 'white', 
-                      position: 'absolute', 
-                      top: '1rem', 
-                      right: '1rem', 
-                      zIndex: '9999',
-                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                      }
-                    }} 
-                    onClick={handleClose}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Message Input Overlay */}
-          <AnimatePresence>
-            {overlayState !== 'CLOSED' && (
-              <motion.div
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
-                  padding: '2rem',
-                  zIndex: 10000,
-                  opacity: overlayOpacity,
-                  y: overlayTranslateY,
-                }}
-                initial={{ opacity: 0, y: 100 }}
-                exit={{ opacity: 0, y: 100 }}
-              >
+                  )}
+                </Suspense>
+                
+                <IconButton 
+                  aria-label="close" 
+                  sx={{ 
+                    color: 'white', 
+                    position: 'absolute', 
+                    top: '1rem', 
+                    right: '1rem', 
+                    zIndex: '9999',
+                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    }
+                  }} 
+                  onClick={handleClose}
+                >
+                  <CloseIcon />
+                </IconButton>
+                
+                {/* Debug indicators */}
                 <Box
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '25px',
-                    padding: '0.5rem 1rem',
-                    backdropFilter: 'blur(10px)',
+                    position: 'absolute',
+                    top: '1rem',
+                    left: '1rem',
+                    color: 'white',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    padding: '0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    zIndex: 9999,
                   }}
                 >
-                  <TextField
-                    id="story-reply-input"
-                    placeholder="Reply to story..."
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSendMessage();
-                      }
-                    }}
-                    sx={{
-                      flex: 1,
-                      '& .MuiInputBase-root': {
-                        color: 'white',
-                        '&::placeholder': {
-                          color: 'rgba(255, 255, 255, 0.7)',
-                        },
-                        '& fieldset': {
-                          border: 'none',
-                        },
-                        '&:hover fieldset': {
-                          border: 'none',
-                        },
-                        '&.Mui-focused fieldset': {
-                          border: 'none',
-                        },
-                      },
-                    }}
-                    InputProps={{
-                      style: { color: 'white' },
-                    }}
-                  />
-                  <IconButton
-                    onClick={handleSendMessage}
-                    disabled={!messageText.trim()}
-                    sx={{
-                      color: messageText.trim() ? 'white' : 'rgba(255, 255, 255, 0.3)',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      },
-                    }}
-                  >
-                    <SendIcon />
-                  </IconButton>
+                  Story {index + 1} of {stories.length} | Active: {activeStoryIndex + 1}
+                </Box>
+                
+                {/* Snap threshold indicator */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '3rem',
+                    left: '1rem',
+                    color: 'white',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    padding: '0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    zIndex: 9999,
+                  }}
+                >
+                  H-Snap: 30% ({Math.round(viewportWidth * 0.3)}px) | V-Dismiss: 10% ({Math.round(viewportHeight * 0.1)}px)
+                </Box>
+
+                {/* Movement type indicator */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '5rem',
+                    left: '1rem',
+                    color: 'white',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    padding: '0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    zIndex: 9999,
+                  }}
+                >
+                  Dragging: {isDragging ? 'Yes' : 'No'} | Vertical: {isVerticalMovement ? 'Yes' : 'No'}
+                </Box>
+                
+                {/* Gesture analysis indicator */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '7rem',
+                    left: '1rem',
+                    color: 'white',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    padding: '0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    zIndex: 9999,
+                  }}
+                >
+                  V-Threshold: cos &gt; 0.98 | H-Threshold: cos &gt; 0.5
+                </Box>
+                
+                {/* New behavior indicator */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '9rem',
+                    left: '1rem',
+                    color: 'white',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    padding: '0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    zIndex: 9999,
+                  }}
+                >
+                  Sensitive V-Dismiss | H-Scroll disabled when V detected
                 </Box>
               </motion.div>
-            )}
-          </AnimatePresence>
+            ))}
+          </motion.div>
         </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
 };
-
-// Dummy components and data for completeness
-const Story2 = () => <div>Story Content</div>;
-const stories2 = [{ content: Story2 }];
-const contentStyle = {};
-const code = {};
-const image = {};
-const customSeeMore = {};
 
 export default Story;

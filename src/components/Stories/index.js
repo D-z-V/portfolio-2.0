@@ -21,23 +21,21 @@ const Stories = (props) => {
   const [animationIndex, setAnimationIndex] = React.useState(null);
 
   const handleStoryClick = (index, position) => {
-    if (index === activeIndex) {
-      setActiveIndex(null);
-    } else {
-      // Always allow opening the story, regardless of viewed status
-      setActiveIndex(index);
-      setIconPosition(position);
-      
-      // Mark as viewed if not already viewed
-      if (!stories[index].viewed) {
-        setAnimationIndex(index);
-        setTimeout(() => {
-          const newStories = [...stories];
-          newStories[index].viewed = true;
-          localStorage.setItem('stories', JSON.stringify(newStories));
-          setStories(newStories);
-        }, 3000);
-      }
+    console.log('Story clicked:', { index, position });
+    
+    // Always allow opening the story, regardless of viewed status
+    setActiveIndex(index);
+    setIconPosition(position);
+    
+    // Mark as viewed if not already viewed
+    if (!stories[index].viewed) {
+      setAnimationIndex(index);
+      setTimeout(() => {
+        const newStories = [...stories];
+        newStories[index].viewed = true;
+        localStorage.setItem('stories', JSON.stringify(newStories));
+        setStories(newStories);
+      }, 3000);
     }
   };
 
@@ -229,48 +227,86 @@ const Stories = (props) => {
             >
 
               {viewed ? (
-                <motion.div
-                  layoutId={`story-${index}`}
-                  style={{
-                    borderRadius: '50%',
-                    height: '65px',
-                    width: '65px',
-                    position: 'absolute',
-                    border: '2px solid rgba(255, 255, 255, 0.3)',
-                    padding: '0.17rem',
-                  }}
-                >
-                <Box
-                  sx={{
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    height: '55px',
-                    width: '55px',
-                    position: 'absolute',
-                    padding: '0.3rem',
-                  }}
-                >
-                  <Image
-                    src={value}
-                    alt={key}
-                    width={45}
-                    height={45}
+                <>
+                  {/* Static icon that doesn't move */}
+                  <div
                     style={{
+                      borderRadius: '50%',
+                      height: '65px',
+                      width: '65px',
                       position: 'absolute',
-                      zIndex: '1',
-                      clipPath: 'circle(50% at 50% 50%)',
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
+                      padding: '0.17rem',
                     }}
-                  />
-                </Box>
-                </motion.div>
+                  >
+                    <Box
+                      sx={{
+                        backgroundColor: 'white',
+                        borderRadius: '50%',
+                        height: '55px',
+                        width: '55px',
+                        position: 'absolute',
+                        padding: '0.3rem',
+                      }}
+                    >
+                      <Image
+                        src={value}
+                        alt={key}
+                        width={45}
+                        height={45}
+                        style={{
+                          position: 'absolute',
+                          zIndex: '1',
+                          clipPath: 'circle(50% at 50% 50%)',
+                        }}
+                      />
+                    </Box>
+                  </div>
+                  {/* Animation element that moves */}
+                  <motion.div
+                    layoutId={`story-${index}`}
+                    style={{
+                      borderRadius: '50%',
+                      height: '65px',
+                      width: '65px',
+                      position: 'absolute',
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
+                      padding: '0.17rem',
+                      opacity: 0, // Hidden but still animates
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        backgroundColor: 'white',
+                        borderRadius: '50%',
+                        height: '55px',
+                        width: '55px',
+                        position: 'absolute',
+                        padding: '0.3rem',
+                      }}
+                    >
+                      <Image
+                        src={value}
+                        alt={key}
+                        width={45}
+                        height={45}
+                        style={{
+                          position: 'absolute',
+                          zIndex: '1',
+                          clipPath: 'circle(50% at 50% 50%)',
+                        }}
+                      />
+                    </Box>
+                  </motion.div>
+                </>
               ) :
                 (
                   <>
                     {index === animationIndex ? (
                       <>
                         <Image src={dynamicStory} alt="dynamic story" width={75} height={75} />
-                        <motion.div
-                          layoutId={`story-${index}`}
+                        {/* Static icon */}
+                        <div
                           style={{
                             backgroundColor: 'white',
                             borderRadius: '50%',
@@ -291,11 +327,8 @@ const Stories = (props) => {
                               clipPath: 'circle(50% at 50% 50%)',
                             }}
                           />
-                        </motion.div>
-                      </>
-                    ) : (
-                      <>
-                        <Image src={staticStory} alt="static story" width={75} height={75} />
+                        </div>
+                        {/* Animation element */}
                         <motion.div
                           layoutId={`story-${index}`}
                           style={{
@@ -305,6 +338,59 @@ const Stories = (props) => {
                             width: '60px',
                             position: 'absolute',
                             padding: '0.4rem',
+                            opacity: 0, // Hidden but still animates
+                          }}
+                        >
+                          <Image
+                            src={value}
+                            alt={key}
+                            width={45}
+                            height={45}
+                            style={{
+                              position: 'absolute',
+                              zIndex: '1',
+                              clipPath: 'circle(50% at 50% 50%)',
+                            }}
+                          />
+                        </motion.div>
+                      </>
+                    ) : (
+                      <>
+                        <Image src={staticStory} alt="static story" width={75} height={75} />
+                        {/* Static icon */}
+                        <div
+                          style={{
+                            backgroundColor: 'white',
+                            borderRadius: '50%',
+                            height: '60px',
+                            width: '60px',
+                            position: 'absolute',
+                            padding: '0.4rem',
+                          }}
+                        >
+                          <Image
+                            src={value}
+                            alt={key}
+                            width={45}
+                            height={45}
+                            style={{
+                              position: 'absolute',
+                              zIndex: '1',
+                              clipPath: 'circle(50% at 50% 50%)',
+                            }}
+                          />
+                        </div>
+                        {/* Animation element */}
+                        <motion.div
+                          layoutId={`story-${index}`}
+                          style={{
+                            backgroundColor: 'white',
+                            borderRadius: '50%',
+                            height: '60px',
+                            width: '60px',
+                            position: 'absolute',
+                            padding: '0.4rem',
+                            opacity: 0, // Hidden but still animates
                           }}
                         >
                           <Image
