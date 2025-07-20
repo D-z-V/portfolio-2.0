@@ -57,7 +57,8 @@ const Story = (props) => {
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isVerticalMovement, setIsVerticalMovement] = useState(false);
+  const [dragDirection, setDragDirection] = useState(null); // 'vertical', 'horizontal', or null
+  const [initialTouchPosition, setInitialTouchPosition] = useState({ x: 0, y: 0 });
   
   // Motion values for animations
   const y = useMotionValue(0);
@@ -82,6 +83,7 @@ const Story = (props) => {
       x.set(0);
       setActiveStoryIndex(0);
       setIsLoading(true);
+      setDragDirection(null);
       
       // Set initial position for horizontal container without animation
       horizontalControls.set({
@@ -112,106 +114,113 @@ const Story = (props) => {
 
   const handleDragStart = (event, info) => {
     setIsDragging(true);
-    setIsVerticalMovement(false); // Reset vertical movement state
+    setDragDirection(null);
+    setInitialTouchPosition({ x: info.point.x, y: info.point.y });
     console.log('Drag start:', { x: info.point.x, y: info.point.y });
   };
 
   const handleDrag = (event, info) => {
-    // Detect vertical movement early during drag
-    const deltaX = info.offset.x;
-    const deltaY = info.offset.y;
-    const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
-    if (magnitude > 10) { // Only check after some movement
-      const cosVertical = Math.abs(deltaY) / magnitude;
-      const cosHorizontal = Math.abs(deltaX) / magnitude;
+    // Only determine direction if not already set and we have sufficient movement
+    if (!dragDirection) {
+      const deltaX = Math.abs(info.offset.x);
+      const deltaY = Math.abs(info.offset.y);
+      const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      // Detect vertical movement with a lower threshold (0.7) for early detection
-      const isVertical = cosVertical > 0.7 && cosHorizontal < 0.7;
-      
-      if (isVertical && !isVerticalMovement) {
-        setIsVerticalMovement(true);
-        console.log('Vertical movement detected during drag');
+      // Wait for at least 20px of movement before determining direction
+      if (magnitude > 20) {
+        const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+        
+        // Strictly vertical: within 15 degrees of vertical (75-90 degrees)
+        if (angle >= 75 && angle <= 90) {
+          setDragDirection('vertical');
+          console.log('Direction locked: VERTICAL');
+        }
+        // Horizontal or diagonal: anything else
+        else {
+          setDragDirection('horizontal');
+          console.log('Direction locked: HORIZONTAL');
+        }
       }
     }
   };
 
   const handleDragEnd = (event, info) => {
     setIsDragging(false);
-    setIsVerticalMovement(false); // Reset vertical movement state
+    const finalDragDirection = dragDirection;
+    setDragDirection(null);
     
-    // Calculate the angle of movement using dot product
     const deltaX = info.offset.x;
     const deltaY = info.offset.y;
     const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
-    if (magnitude === 0) return; // No movement
+    if (magnitude === 0) return;
     
-    // Calculate cosine of angle with vertical axis (0° = vertical, 90° = horizontal)
-    const cosVertical = Math.abs(deltaY) / magnitude;
-    const cosHorizontal = Math.abs(deltaX) / magnitude;
-    
-    // Much stricter vertical threshold - only consider it vertical if cos > 0.98
-    const isStrictlyVertical = cosVertical > 0.98;
-    
-    console.log('Vertical drag analysis:', { 
+    console.log('Drag end analysis:', { 
       deltaX, 
       deltaY, 
       magnitude,
-      cosVertical,
-      cosHorizontal,
-      isStrictlyVertical
+      finalDragDirection,
+      velocityY: info.velocity.y
     });
     
-    // Only handle vertical dismiss if it's strictly vertical (cos > 0.98)
-    if (isStrictlyVertical && deltaY > 0) {
-      // Much more sensitive thresholds for vertical dismiss
-      const dismissThreshold = viewportHeight * 0.1; // Reduced from 0.2 to 0.1 (10% of screen)
-      const flickVelocityThreshold = 300; // Reduced from 600 to 300
-      const minDismissDistance = 50; // Minimum distance to dismiss
+    // Handle based on locked direction
+    if (finalDragDirection === 'vertical') {
+      // STRICTLY VERTICAL - only handle dismiss, no horizontal navigation
+      if (deltaY > 0) {
+        const dismissThreshold = viewportHeight * 0.1; // 10% of screen
+        const flickVelocityThreshold = 300;
+        const minDismissDistance = 50;
 
-      if (deltaY > dismissThreshold || info.velocity.y > flickVelocityThreshold || deltaY > minDismissDistance) {
-        console.log('Dismissing story - sensitive vertical threshold met');
-        handleClose();
+        if (deltaY > dismissThreshold || info.velocity.y > flickVelocityThreshold || deltaY > minDismissDistance) {
+          console.log('Dismissing story - vertical threshold met');
+          handleClose();
+        } else {
+          console.log('Snapping back - vertical threshold not met');
+          // Snap back to fullscreen with no horizontal movement
+          controls.start({
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            borderRadius: "0%",
+            transition: {
+              type: "spring",
+              stiffness: 1200,
+              damping: 50,
+              duration: 0.1
+            }
+          });
+        }
       } else {
-        console.log('Snapping back - sensitive vertical threshold not met');
-        // Snap back to fullscreen
+        // Upward vertical movement - just snap back
         controls.start({
           y: 0,
           scale: 1,
           opacity: 1,
           borderRadius: "0%",
-          x: 0, // Ensure icon returns to original position
           transition: {
             type: "spring",
-            stiffness: 1200, // Much faster spring for instant response
-            damping: 50, // Higher damping for less bounce
-            duration: 0.1 // Very quick snap back
+            stiffness: 1200,
+            damping: 50,
+            duration: 0.1
           }
         });
       }
-    } else {
-      // If not strictly vertical (cos < 0.98), treat as horizontal swipe
-      // Use the magnitude of the cosine for horizontal navigation
-      const horizontalMagnitude = cosHorizontal;
-      const threshold = viewportWidth * 0.3; // 30% threshold
-      const offset = deltaX * horizontalMagnitude; // Scale by horizontal component
-      
+    } else if (finalDragDirection === 'horizontal' || !finalDragDirection) {
+      // HORIZONTAL OR DIAGONAL - handle story navigation
+      const threshold = viewportWidth * 0.3;
       let newIndex = activeStoryIndex;
       
-      // Only change story if threshold is met
-      if (Math.abs(offset) > threshold) {
-        if (offset > 0 && activeStoryIndex > 0) {
+      if (Math.abs(deltaX) > threshold) {
+        if (deltaX > 0 && activeStoryIndex > 0) {
           newIndex = activeStoryIndex - 1;
-        } else if (offset < 0 && activeStoryIndex < stories.length - 1) {
+        } else if (deltaX < 0 && activeStoryIndex < stories.length - 1) {
           newIndex = activeStoryIndex + 1;
         }
       }
       
-      console.log('Horizontal navigation from vertical drag:', { 
-        offset, 
+      console.log('Horizontal navigation:', { 
+        deltaX, 
         threshold, 
-        horizontalMagnitude,
         activeStoryIndex, 
         newIndex,
         willChange: newIndex !== activeStoryIndex 
@@ -224,9 +233,9 @@ const Story = (props) => {
         x: -newIndex * viewportWidth,
         transition: { 
           type: "spring", 
-          stiffness: 800, // Much faster spring
-          damping: 40, // More damping for less bouncy animation
-          duration: 0.15 // Even quicker animation
+          stiffness: 800,
+          damping: 40,
+          duration: 0.15
         }
       });
       
@@ -236,12 +245,11 @@ const Story = (props) => {
         scale: 1,
         opacity: 1,
         borderRadius: "0%",
-        x: 0, // Ensure icon returns to original position
         transition: {
           type: "spring",
-          stiffness: 500, // Faster spring
-          damping: 30, // Less damping for snappier animation
-          duration: 0.2 // Quicker snap back
+          stiffness: 500,
+          damping: 30,
+          duration: 0.2
         }
       });
     }
@@ -249,11 +257,12 @@ const Story = (props) => {
 
   const handleHorizontalDragEnd = (event, info) => {
     setIsDragging(false);
-    setIsVerticalMovement(false); // Reset vertical movement state
+    const finalDragDirection = dragDirection;
+    setDragDirection(null);
     
-    // If vertical movement was detected during drag, ignore horizontal navigation
-    if (isVerticalMovement) {
-      console.log('Ignoring horizontal navigation - vertical movement detected');
+    // If drag was locked to vertical, ignore horizontal navigation completely
+    if (finalDragDirection === 'vertical') {
+      console.log('Ignoring horizontal navigation - was vertical drag');
       // Snap back to current position
       horizontalControls.start({
         x: -activeStoryIndex * viewportWidth,
@@ -266,109 +275,51 @@ const Story = (props) => {
       return;
     }
     
-    // Calculate the angle of movement using dot product
     const deltaX = info.offset.x;
     const deltaY = info.offset.y;
     const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
-    if (magnitude === 0) return; // No movement
+    if (magnitude === 0) return;
     
-    // Calculate cosine of angle with horizontal axis
-    const cosHorizontal = Math.abs(deltaX) / magnitude;
-    const cosVertical = Math.abs(deltaY) / magnitude;
-    
-    // Consider it horizontal if it's more horizontal than vertical AND not strictly vertical
-    const isStrictlyVertical = cosVertical > 0.98;
-    const isHorizontal = cosHorizontal > cosVertical && !isStrictlyVertical;
-    
-    console.log('Horizontal drag analysis:', { 
+    console.log('Horizontal drag end analysis:', { 
       deltaX, 
       deltaY, 
       magnitude,
-      cosHorizontal,
-      cosVertical,
-      isStrictlyVertical,
-      isHorizontal
+      finalDragDirection
     });
     
     // Handle horizontal navigation
-    if (isHorizontal) {
-      const threshold = viewportWidth * 0.3; // 30% threshold
-      const offset = deltaX;
-      
-      let newIndex = activeStoryIndex;
-      let willSnap = false;
-      
-      // Only change story if 30% is revealed
-      if (Math.abs(offset) > threshold) {
-        willSnap = true;
-        if (offset > 0 && activeStoryIndex > 0) {
-          newIndex = activeStoryIndex - 1;
-        } else if (offset < 0 && activeStoryIndex < stories.length - 1) {
-          newIndex = activeStoryIndex + 1;
-        }
+    const threshold = viewportWidth * 0.3;
+    let newIndex = activeStoryIndex;
+    
+    if (Math.abs(deltaX) > threshold) {
+      if (deltaX > 0 && activeStoryIndex > 0) {
+        newIndex = activeStoryIndex - 1;
+      } else if (deltaX < 0 && activeStoryIndex < stories.length - 1) {
+        newIndex = activeStoryIndex + 1;
       }
-      
-      console.log('Horizontal navigation decision:', { 
-        offset, 
-        threshold, 
-        activeStoryIndex, 
-        newIndex,
-        willSnap,
-        willChange: newIndex !== activeStoryIndex 
-      });
-      
-      setActiveStoryIndex(newIndex);
-      
-      // Animate to the correct position
-      horizontalControls.start({
-        x: -newIndex * viewportWidth,
-        transition: { 
-          type: "spring", 
-          stiffness: 800, // Much faster spring
-          damping: 40, // More damping for less bouncy animation
-          duration: 0.15 // Even quicker animation
-        }
-      });
-    } else if (isStrictlyVertical && deltaY > 0) {
-      // If it's strictly vertical and downward, handle as vertical dismiss
-      // Use the same sensitive thresholds as vertical drag
-      const dismissThreshold = viewportHeight * 0.1; // 10% of screen
-      const flickVelocityThreshold = 300; // Reduced velocity threshold
-      const minDismissDistance = 50; // Minimum distance to dismiss
-
-      if (deltaY > dismissThreshold || info.velocity.y > flickVelocityThreshold || deltaY > minDismissDistance) {
-        console.log('Dismissing story from horizontal drag - sensitive vertical threshold met');
-        handleClose();
-      } else {
-        console.log('Snapping back from horizontal drag - sensitive vertical threshold not met');
-        // Snap back to fullscreen
-        controls.start({
-          y: 0,
-          scale: 1,
-          opacity: 1,
-          borderRadius: "0%",
-          x: 0, // Ensure icon returns to original position
-          transition: {
-            type: "spring",
-            stiffness: 800, // Much faster spring
-            damping: 40, // More damping for less bouncy animation
-            duration: 0.15 // Even quicker snap back
-          }
-        });
-      }
-    } else {
-      // If not clearly horizontal or vertical, snap back to current position
-      console.log('Snapping back - ambiguous movement');
-      horizontalControls.start({
-        x: -activeStoryIndex * viewportWidth,
-        transition: { 
-          type: "spring", 
-          stiffness: 500,
-          damping: 30
-        }
-      });
     }
+    
+    console.log('Horizontal navigation decision:', { 
+      deltaX, 
+      threshold, 
+      activeStoryIndex, 
+      newIndex,
+      willChange: newIndex !== activeStoryIndex 
+    });
+    
+    setActiveStoryIndex(newIndex);
+    
+    // Animate to the correct position
+    horizontalControls.start({
+      x: -newIndex * viewportWidth,
+      transition: { 
+        type: "spring", 
+        stiffness: 800,
+        damping: 40,
+        duration: 0.15
+      }
+    });
   };
 
   const handleKeyDown = (event) => {
@@ -381,9 +332,9 @@ const Story = (props) => {
         x: -newIndex * viewportWidth,
         transition: { 
           type: "spring", 
-          stiffness: 800, // Much faster spring
-          damping: 40, // More damping for less bouncy animation
-          duration: 0.15 // Even quicker animation
+          stiffness: 800,
+          damping: 40,
+          duration: 0.15
         }
       });
     } else if (event.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) {
@@ -393,9 +344,9 @@ const Story = (props) => {
         x: -newIndex * viewportWidth,
         transition: { 
           type: "spring", 
-          stiffness: 800, // Much faster spring
-          damping: 40, // More damping for less bouncy animation
-          duration: 0.15 // Even quicker animation
+          stiffness: 800,
+          damping: 40,
+          duration: 0.15
         }
       });
     }
@@ -435,13 +386,13 @@ const Story = (props) => {
               width: '100vw',
               height: '100vh',
               backgroundColor: 'black',
-              zIndex: 9997, // Just below the story component
+              zIndex: 9997,
             }}
           />
           
           <motion.div
             layoutId={props.storyId}
-            drag="y"
+            drag={dragDirection === 'horizontal' ? false : "y"}
             dragConstraints={{ top: 0, bottom: viewportHeight }}
             dragElastic={{ top: 0.2, bottom: 0.8 }}
             onDragStart={handleDragStart}
@@ -464,28 +415,14 @@ const Story = (props) => {
               borderRadius: isDragging ? "0%" : borderRadius,
               userSelect: 'none',
               WebkitUserSelect: 'none',
-              overflow: 'hidden', // Prevent left/right sides from showing
+              overflow: 'hidden',
             }}
-            // Remove initial and exit animations - let layoutId handle the transition
             animate={controls}
-            // exit={{
-            //   borderRadius: "50%",
-            //   opacity: 0,
-            //   scale: 0.8,
-            //   x: 0,
-            //   y: 0,
-            //   transition: {
-            //     type: "spring",
-            //     stiffness: 2000, // Very fast spring for quick dismiss
-            //     damping: 10, // Less damping for snappy return
-            //     duration: 0.1 // Quick dismiss animation
-            //   }
-            // }}
             transition={{
               type: "spring",
-              stiffness: 1200, // Much faster spring for quick return
-              damping: 40, // Less damping for snappier animation
-              duration: 0.3 // Very quick close animation
+              stiffness: 1200,
+              damping: 40,
+              duration: 0.3
             }}
           >
           {/* Horizontal Swipe Container */}
@@ -496,9 +433,9 @@ const Story = (props) => {
               height: '100vh',
               display: 'flex',
               position: 'relative',
-              overflow: 'hidden', // Prevent horizontal overflow during animation
+              overflow: 'hidden',
             }}
-            drag={isVerticalMovement ? null : "x"}
+            drag={dragDirection === 'vertical' ? false : "x"}
             dragConstraints={{
               left: -(stories.length - 1) * viewportWidth,
               right: 0
@@ -506,6 +443,7 @@ const Story = (props) => {
             dragElastic={0.1}
             dragMomentum={false}
             onDragStart={handleDragStart}
+            onDrag={handleDrag}
             onDragEnd={handleHorizontalDragEnd}
             animate={horizontalControls}
           >
@@ -623,7 +561,7 @@ const Story = (props) => {
                   Story {index + 1} of {stories.length} | Active: {activeStoryIndex + 1}
                 </Box>
                 
-                {/* Snap threshold indicator */}
+                {/* Direction indicator */}
                 <Box
                   sx={{
                     position: 'absolute',
@@ -637,10 +575,10 @@ const Story = (props) => {
                     zIndex: 9999,
                   }}
                 >
-                  H-Snap: 30% ({Math.round(viewportWidth * 0.3)}px) | V-Dismiss: 10% ({Math.round(viewportHeight * 0.1)}px)
+                  Direction: {dragDirection || 'none'} | Dragging: {isDragging ? 'Yes' : 'No'}
                 </Box>
 
-                {/* Movement type indicator */}
+                {/* Threshold indicator */}
                 <Box
                   sx={{
                     position: 'absolute',
@@ -654,10 +592,10 @@ const Story = (props) => {
                     zIndex: 9999,
                   }}
                 >
-                  Dragging: {isDragging ? 'Yes' : 'No'} | Vertical: {isVerticalMovement ? 'Yes' : 'No'}
+                  Vertical: 75-90° only | Horizontal: everything else
                 </Box>
                 
-                {/* Gesture analysis indicator */}
+                {/* Rules indicator */}
                 <Box
                   sx={{
                     position: 'absolute',
@@ -671,24 +609,7 @@ const Story = (props) => {
                     zIndex: 9999,
                   }}
                 >
-                  V-Threshold: cos &gt; 0.98 | H-Threshold: cos &gt; 0.5
-                </Box>
-                
-                {/* New behavior indicator */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: '9rem',
-                    left: '1rem',
-                    color: 'white',
-                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                    padding: '0.5rem',
-                    borderRadius: '4px',
-                    fontSize: '10px',
-                    zIndex: 9999,
-                  }}
-                >
-                  Sensitive V-Dismiss | H-Scroll disabled when V detected
+                  STRICT VERTICAL = dismiss only | DIAGONAL/HORIZONTAL = navigate
                 </Box>
               </motion.div>
             ))}
