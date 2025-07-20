@@ -272,7 +272,14 @@ const Stories = (props) => {
                       position: 'absolute',
                       border: '2px solid rgba(255, 255, 255, 0.3)',
                       padding: '0.17rem',
-                      opacity: 0, // Hidden but still animates
+                      opacity: activeIndex === index ? 0 : 1, // Visible when not active
+                      zIndex: activeIndex === index ? 0 : 1, // Lower z-index when active
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 1000, // Very fast spring for quick dismiss
+                      damping: 60, // Less damping for snappy return
+                      duration: 0.1 // Quick dismiss animation
                     }}
                   >
                     <Box
@@ -338,7 +345,14 @@ const Stories = (props) => {
                             width: '60px',
                             position: 'absolute',
                             padding: '0.4rem',
-                            opacity: 0, // Hidden but still animates
+                            opacity: activeIndex === index ? 0 : 1, // Visible when not active
+                            zIndex: activeIndex === index ? 0 : 1, // Lower z-index when active
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 2000, // Very fast spring for quick dismiss
+                            damping: 20, // Less damping for snappy return
+                            duration: 0.1 // Quick dismiss animation
                           }}
                         >
                           <Image
@@ -390,7 +404,14 @@ const Stories = (props) => {
                             width: '60px',
                             position: 'absolute',
                             padding: '0.4rem',
-                            opacity: 0, // Hidden but still animates
+                            opacity: activeIndex === index ? 0 : 1, // Visible when not active
+                            zIndex: activeIndex === index ? 0 : 1, // Lower z-index when active
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 2000, // Very fast spring for quick dismiss
+                            damping: 20, // Less damping for snappy return
+                            duration: 0.1 // Quick dismiss animation
                           }}
                         >
                           <Image

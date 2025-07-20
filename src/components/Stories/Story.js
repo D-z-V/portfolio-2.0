@@ -68,9 +68,9 @@ const Story = (props) => {
   
   // Remove scaling/opacity transforms during drag - keep component same size
   // Only apply transforms when dismissing (after drag ends)
-  const scale = useTransform(y, [0, viewportHeight * 0.5, viewportHeight], [1, 0.9, 0.7]);
-  const opacity = useTransform(y, [0, viewportHeight * 0.6, viewportHeight], [1, 0.8, 0.3]);
-  const borderRadius = useTransform(y, [0, viewportHeight * 0.3, viewportHeight / 2], ["0%", "20%", "40%"]);
+  const scale = useTransform(y, [0, viewportHeight * 0.3, viewportHeight], [1, 0.9, 0.8]);
+  const opacity = useTransform(y, [0, viewportHeight * 0.5, viewportHeight], [1, 0.8, 0.4]);
+  const borderRadius = useTransform(y, [0, viewportHeight * 0.2, viewportHeight / 2], ["0%", "15%", "30%"]);
   
   const controls = useAnimation();
   const horizontalControls = useAnimation();
@@ -83,9 +83,17 @@ const Story = (props) => {
       setActiveStoryIndex(0);
       setIsLoading(true);
       
-      // Set initial position for horizontal container
+      // Set initial position for horizontal container without animation
       horizontalControls.set({
         x: 0
+      });
+      
+      // Don't animate controls when story opens - let layoutId handle it
+      controls.set({
+        y: 0,
+        scale: 1,
+        opacity: 1,
+        borderRadius: "0%"
       });
       
       // Simulate loading completion after a short delay
@@ -173,10 +181,12 @@ const Story = (props) => {
           scale: 1,
           opacity: 1,
           borderRadius: "0%",
+          x: 0, // Ensure icon returns to original position
           transition: {
             type: "spring",
-            stiffness: 450,
-            damping: 25,
+            stiffness: 1200, // Much faster spring for instant response
+            damping: 50, // Higher damping for less bounce
+            duration: 0.1 // Very quick snap back
           }
         });
       }
@@ -214,8 +224,9 @@ const Story = (props) => {
         x: -newIndex * viewportWidth,
         transition: { 
           type: "spring", 
-          stiffness: 500,
-          damping: 30
+          stiffness: 800, // Much faster spring
+          damping: 40, // More damping for less bouncy animation
+          duration: 0.15 // Even quicker animation
         }
       });
       
@@ -225,10 +236,12 @@ const Story = (props) => {
         scale: 1,
         opacity: 1,
         borderRadius: "0%",
+        x: 0, // Ensure icon returns to original position
         transition: {
           type: "spring",
-          stiffness: 450,
-          damping: 25,
+          stiffness: 500, // Faster spring
+          damping: 30, // Less damping for snappier animation
+          duration: 0.2 // Quicker snap back
         }
       });
     }
@@ -312,8 +325,9 @@ const Story = (props) => {
         x: -newIndex * viewportWidth,
         transition: { 
           type: "spring", 
-          stiffness: 500,
-          damping: 30
+          stiffness: 800, // Much faster spring
+          damping: 40, // More damping for less bouncy animation
+          duration: 0.15 // Even quicker animation
         }
       });
     } else if (isStrictlyVertical && deltaY > 0) {
@@ -334,10 +348,12 @@ const Story = (props) => {
           scale: 1,
           opacity: 1,
           borderRadius: "0%",
+          x: 0, // Ensure icon returns to original position
           transition: {
             type: "spring",
-            stiffness: 450,
-            damping: 25,
+            stiffness: 800, // Much faster spring
+            damping: 40, // More damping for less bouncy animation
+            duration: 0.15 // Even quicker snap back
           }
         });
       }
@@ -365,8 +381,9 @@ const Story = (props) => {
         x: -newIndex * viewportWidth,
         transition: { 
           type: "spring", 
-          stiffness: 500,
-          damping: 30
+          stiffness: 800, // Much faster spring
+          damping: 40, // More damping for less bouncy animation
+          duration: 0.15 // Even quicker animation
         }
       });
     } else if (event.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) {
@@ -376,8 +393,9 @@ const Story = (props) => {
         x: -newIndex * viewportWidth,
         transition: { 
           type: "spring", 
-          stiffness: 500,
-          damping: 30
+          stiffness: 800, // Much faster spring
+          damping: 40, // More damping for less bouncy animation
+          duration: 0.15 // Even quicker animation
         }
       });
     }
@@ -446,24 +464,29 @@ const Story = (props) => {
               borderRadius: isDragging ? "0%" : borderRadius,
               userSelect: 'none',
               WebkitUserSelect: 'none',
+              overflow: 'hidden', // Prevent left/right sides from showing
             }}
-            initial={{
-              borderRadius: "50%",
-              opacity: 0,
-              scale: 0.8,
-            }}
-            exit={{
-              borderRadius: "50%",
-              opacity: 0,
-              scale: 0.8,
-              transition: {
-                type: "spring",
-                stiffness: 300,
-                damping: 20,
-                duration: 0.25
-              }
-            }}
+            // Remove initial and exit animations - let layoutId handle the transition
             animate={controls}
+            // exit={{
+            //   borderRadius: "50%",
+            //   opacity: 0,
+            //   scale: 0.8,
+            //   x: 0,
+            //   y: 0,
+            //   transition: {
+            //     type: "spring",
+            //     stiffness: 2000, // Very fast spring for quick dismiss
+            //     damping: 10, // Less damping for snappy return
+            //     duration: 0.1 // Quick dismiss animation
+            //   }
+            // }}
+            transition={{
+              type: "spring",
+              stiffness: 1200, // Much faster spring for quick return
+              damping: 40, // Less damping for snappier animation
+              duration: 0.3 // Very quick close animation
+            }}
           >
           {/* Horizontal Swipe Container */}
           <motion.div
@@ -473,6 +496,7 @@ const Story = (props) => {
               height: '100vh',
               display: 'flex',
               position: 'relative',
+              overflow: 'hidden', // Prevent horizontal overflow during animation
             }}
             drag={isVerticalMovement ? null : "x"}
             dragConstraints={{
