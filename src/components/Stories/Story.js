@@ -420,9 +420,9 @@ const Story = (props) => {
             animate={controls}
             transition={{
               type: "spring",
-              stiffness: 1200,
-              damping: 40,
-              duration: 0.3
+              stiffness: 600,
+              damping: 50,
+              duration: 0.05
             }}
           >
           {/* Horizontal Swipe Container */}
