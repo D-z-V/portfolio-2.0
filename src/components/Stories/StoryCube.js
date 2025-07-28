@@ -141,10 +141,11 @@ const StoryCube = (props) => {
         } else {
           setDragDirection('horizontal');
           // For horizontal drag, update cube rotation in real-time
-          // Drag right (positive X) should rotate cube right (positive rotation)
-          // Drag left (negative X) should rotate cube left (negative rotation)
+          // Testing reversed direction: 
+          // Swipe right (positive deltaX) should rotate cube left (negative) to peek at next story
+          // Swipe left (negative deltaX) should rotate cube right (positive) to peek at previous story
           const dragProgress = info.offset.x / viewportWidth;
-          const rotationDelta = dragProgress * 90; // 90 degrees per story
+          const rotationDelta = -dragProgress * 90; // Reversed mapping
           const newRotation = cubeRotation + rotationDelta;
           rotationY.set(newRotation);
         }
@@ -152,7 +153,7 @@ const StoryCube = (props) => {
     } else if (dragDirection === 'horizontal') {
       // Continue real-time cube rotation during horizontal drag
       const dragProgress = info.offset.x / viewportWidth;
-      const rotationDelta = dragProgress * 90;
+      const rotationDelta = -dragProgress * 90; // Reversed mapping
       const newRotation = cubeRotation + rotationDelta;
       rotationY.set(newRotation);
     }
@@ -215,13 +216,14 @@ const StoryCube = (props) => {
       
       // Check if we should navigate based on threshold or velocity
       if (Math.abs(deltaX) > threshold || Math.abs(info.velocity.x) > 500) {
-        // Instagram-style navigation:
-        // Swipe left (deltaX < 0) = go to NEXT story (index + 1)
-        // Swipe right (deltaX > 0) = go to PREVIOUS story (index - 1)
-        if (deltaX < 0 && activeStoryIndex < stories.length - 1) {
-          newIndex = activeStoryIndex + 1; // Next story
-        } else if (deltaX > 0 && activeStoryIndex > 0) {
-          newIndex = activeStoryIndex - 1; // Previous story
+        // Instagram-style navigation (CORRECTED):
+        // Swipe left (deltaX < 0) = go to NEXT story 
+        // Swipe right (deltaX > 0) = go to PREVIOUS story
+        // BUT: Let's test the opposite to see if this fixes the issue
+        if (deltaX > 0 && activeStoryIndex < stories.length - 1) {
+          newIndex = activeStoryIndex + 1; // Next story (testing reversed direction)
+        } else if (deltaX < 0 && activeStoryIndex > 0) {
+          newIndex = activeStoryIndex - 1; // Previous story (testing reversed direction)
         }
       }
       
@@ -600,7 +602,7 @@ const StoryCube = (props) => {
                 zIndex: 9999,
               }}
             >
-              Swipe LEFT for next story | Swipe RIGHT for previous | Swipe DOWN to dismiss
+              TESTING: Swipe RIGHT for next story | Swipe LEFT for previous | Swipe DOWN to dismiss
             </Box>
             
             {/* Threshold indicator */}
@@ -617,7 +619,24 @@ const StoryCube = (props) => {
                 zIndex: 9999,
               }}
             >
-              Threshold: 25% of screen width | Current rotation: {Math.round(cubeRotation)}°
+              Threshold: 25% ({Math.round(viewportWidth * 0.25)}px) | Target rotation: {Math.round(cubeRotation)}°
+            </Box>
+            
+            {/* Real-time rotation indicator */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '9rem',
+                left: '1rem',
+                color: 'white',
+                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                padding: '0.5rem',
+                borderRadius: '4px',
+                fontSize: '10px',
+                zIndex: 9999,
+              }}
+            >
+              Live rotation: {Math.round(rotationY.get())}° | Active story: {activeStoryIndex}
             </Box>
           </motion.div>
         </>
