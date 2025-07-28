@@ -141,9 +141,11 @@ const StoryCube = (props) => {
         } else {
           setDragDirection('horizontal');
           // For horizontal drag, update cube rotation in real-time
+          // Drag right (positive X) should rotate cube right (positive rotation)
+          // Drag left (negative X) should rotate cube left (negative rotation)
           const dragProgress = info.offset.x / viewportWidth;
           const rotationDelta = dragProgress * 90; // 90 degrees per story
-          const newRotation = cubeRotation - rotationDelta;
+          const newRotation = cubeRotation + rotationDelta;
           rotationY.set(newRotation);
         }
       }
@@ -151,7 +153,7 @@ const StoryCube = (props) => {
       // Continue real-time cube rotation during horizontal drag
       const dragProgress = info.offset.x / viewportWidth;
       const rotationDelta = dragProgress * 90;
-      const newRotation = cubeRotation - rotationDelta;
+      const newRotation = cubeRotation + rotationDelta;
       rotationY.set(newRotation);
     }
   };
@@ -208,14 +210,18 @@ const StoryCube = (props) => {
       }
     } else if (finalDragDirection === 'horizontal') {
       // Handle 3D cube navigation
-      const threshold = viewportWidth * 0.3;
+      const threshold = viewportWidth * 0.25; // Reduced threshold for better UX
       let newIndex = activeStoryIndex;
       
+      // Check if we should navigate based on threshold or velocity
       if (Math.abs(deltaX) > threshold || Math.abs(info.velocity.x) > 500) {
-        if (deltaX > 0 && activeStoryIndex > 0) {
-          newIndex = activeStoryIndex - 1;
-        } else if (deltaX < 0 && activeStoryIndex < stories.length - 1) {
-          newIndex = activeStoryIndex + 1;
+        // Instagram-style navigation:
+        // Swipe left (deltaX < 0) = go to NEXT story (index + 1)
+        // Swipe right (deltaX > 0) = go to PREVIOUS story (index - 1)
+        if (deltaX < 0 && activeStoryIndex < stories.length - 1) {
+          newIndex = activeStoryIndex + 1; // Next story
+        } else if (deltaX > 0 && activeStoryIndex > 0) {
+          newIndex = activeStoryIndex - 1; // Previous story
         }
       }
       
@@ -224,7 +230,7 @@ const StoryCube = (props) => {
       const targetRotation = -newIndex * 90; // Each story is 90 degrees apart
       setCubeRotation(targetRotation);
       
-      // Animate cube to final position
+      // Animate cube to final position (whether changed or snapping back)
       cubeControls.start({
         rotateY: targetRotation,
         transition: { 
@@ -234,6 +240,9 @@ const StoryCube = (props) => {
           duration: 0.25
         }
       });
+      
+      // Reset the real-time rotation value to match the target
+      rotationY.set(targetRotation);
       
       // Also snap back vertical position
       controls.start({
@@ -268,6 +277,7 @@ const StoryCube = (props) => {
           duration: 0.25
         }
       });
+      rotationY.set(targetRotation);
     } else if (event.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) {
       const newIndex = activeStoryIndex + 1;
       setActiveStoryIndex(newIndex);
@@ -282,8 +292,9 @@ const StoryCube = (props) => {
           duration: 0.25
         }
       });
+      rotationY.set(targetRotation);
     }
-  }, [activeStoryIndex, cubeControls]);
+  }, [activeStoryIndex, cubeControls, rotationY]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -589,7 +600,24 @@ const StoryCube = (props) => {
                 zIndex: 9999,
               }}
             >
-              Swipe horizontally for 3D cube navigation | Swipe down to dismiss
+              Swipe LEFT for next story | Swipe RIGHT for previous | Swipe DOWN to dismiss
+            </Box>
+            
+            {/* Threshold indicator */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '7rem',
+                left: '1rem',
+                color: 'white',
+                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                padding: '0.5rem',
+                borderRadius: '4px',
+                fontSize: '10px',
+                zIndex: 9999,
+              }}
+            >
+              Threshold: 25% of screen width | Current rotation: {Math.round(cubeRotation)}°
             </Box>
           </motion.div>
         </>
