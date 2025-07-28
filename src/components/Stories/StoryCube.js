@@ -141,11 +141,11 @@ const StoryCube = (props) => {
         } else {
           setDragDirection('horizontal');
           // For horizontal drag, update cube rotation in real-time
-          // Testing reversed direction: 
-          // Swipe right (positive deltaX) should rotate cube left (negative) to peek at next story
-          // Swipe left (negative deltaX) should rotate cube right (positive) to peek at previous story
+          // CORRECTED: Cube should rotate in the SAME direction as the swipe
+          // Swipe right (positive deltaX) should rotate cube right (positive)
+          // Swipe left (negative deltaX) should rotate cube left (negative)
           const dragProgress = info.offset.x / viewportWidth;
-          const rotationDelta = -dragProgress * 90; // Reversed mapping
+          const rotationDelta = dragProgress * 90; // Direct mapping - cube follows finger
           const newRotation = cubeRotation + rotationDelta;
           rotationY.set(newRotation);
         }
@@ -153,7 +153,7 @@ const StoryCube = (props) => {
     } else if (dragDirection === 'horizontal') {
       // Continue real-time cube rotation during horizontal drag
       const dragProgress = info.offset.x / viewportWidth;
-      const rotationDelta = -dragProgress * 90; // Reversed mapping
+      const rotationDelta = dragProgress * 90; // Direct mapping - cube follows finger
       const newRotation = cubeRotation + rotationDelta;
       rotationY.set(newRotation);
     }
@@ -216,14 +216,14 @@ const StoryCube = (props) => {
       
       // Check if we should navigate based on threshold or velocity
       if (Math.abs(deltaX) > threshold || Math.abs(info.velocity.x) > 500) {
-        // Instagram-style navigation (CORRECTED):
-        // Swipe left (deltaX < 0) = go to NEXT story 
-        // Swipe right (deltaX > 0) = go to PREVIOUS story
-        // BUT: Let's test the opposite to see if this fixes the issue
-        if (deltaX > 0 && activeStoryIndex < stories.length - 1) {
-          newIndex = activeStoryIndex + 1; // Next story (testing reversed direction)
-        } else if (deltaX < 0 && activeStoryIndex > 0) {
-          newIndex = activeStoryIndex - 1; // Previous story (testing reversed direction)
+        // Instagram-style navigation (FINAL FIX):
+        // With natural cube rotation (cube follows finger):
+        // Swipe LEFT (deltaX < 0) = cube rotates left = reveals NEXT story (from right face)
+        // Swipe RIGHT (deltaX > 0) = cube rotates right = reveals PREVIOUS story (from left face)
+        if (deltaX < 0 && activeStoryIndex < stories.length - 1) {
+          newIndex = activeStoryIndex + 1; // Next story
+        } else if (deltaX > 0 && activeStoryIndex > 0) {
+          newIndex = activeStoryIndex - 1; // Previous story
         }
       }
       
@@ -602,7 +602,7 @@ const StoryCube = (props) => {
                 zIndex: 9999,
               }}
             >
-              TESTING: Swipe RIGHT for next story | Swipe LEFT for previous | Swipe DOWN to dismiss
+              FIXED: Swipe LEFT for next story | Swipe RIGHT for previous | Swipe DOWN to dismiss
             </Box>
             
             {/* Threshold indicator */}
