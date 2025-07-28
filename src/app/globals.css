@@ -161,7 +161,8 @@ a {
   touch-action: pan-y;
 }
 
-.cube {
+/* Generic cube styles - not for StoryCube component */
+.cube:not(.stories-cube) {
   position: absolute;
   top: 0;
   left: 0;
@@ -173,7 +174,8 @@ a {
   /* REMOVED: Auto transition - only animate on user control */
 }
 
-.cube__face {
+/* Generic cube face styles - not for StoryCube component */
+.cube__face:not(.story-face) {
   position: absolute;
   top: 0;
   left: 0;
@@ -280,8 +282,8 @@ a {
 
 /* Reduced motion support for all story animations */
 @media (prefers-reduced-motion: reduce) {
-  .cube,
-  .cube__face,
+  .cube:not(.stories-cube),
+  .cube__face:not(.story-face),
   .story-viewer--entering,
   .story-viewer--dismissing,
   .story-viewer--snapping-back {
@@ -293,7 +295,7 @@ a {
     perspective: none;
   }
   
-  .cube {
+  .cube:not(.stories-cube) {
     transform-style: flat;
   }
 }
@@ -315,7 +317,7 @@ a {
 }
 
 /* Hardware acceleration */
-.cube, .cube__face, .story {
+.cube:not(.stories-cube), .cube__face:not(.story-face), .story {
   transform: translateZ(0);
 }
 
@@ -612,8 +614,8 @@ img {
 
 /* Reduced motion support for all story animations */
 @media (prefers-reduced-motion: reduce) {
-  .cube,
-  .cube__face,
+  .cube:not(.stories-cube),
+  .cube__face:not(.story-face),
   .story-viewer--entering,
   .story-viewer--dismissing,
   .story-viewer--snapping-back {
@@ -625,7 +627,7 @@ img {
     perspective: none;
   }
   
-  .cube {
+  .cube:not(.stories-cube) {
     transform-style: flat;
   }
 }
@@ -645,13 +647,13 @@ img {
 }
 
 /* Smooth animations */
-.cube, .cube__face {
+.cube:not(.stories-cube), .cube__face:not(.story-face) {
   backface-visibility: hidden;
   transform-style: preserve-3d;
 }
 
 /* Hardware acceleration */
-.cube, .cube__face, .story {
+.cube:not(.stories-cube), .cube__face:not(.story-face), .story {
   transform: translateZ(0);
 }
 
@@ -946,8 +948,8 @@ img {
 @media (prefers-reduced-motion: reduce) {
   .story,
   .story-viewer,
-  .cube,
-  .cube__face,
+  .cube:not(.stories-cube),
+  .cube__face:not(.story-face),
   .story-nav-button {
     transition: none !important;
     animation: none !important;
@@ -962,7 +964,7 @@ img {
     perspective: none;
   }
   
-  .cube {
+  .cube:not(.stories-cube) {
     transform-style: flat;
   }
 }

@@ -60,12 +60,16 @@ const StoryCube = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [dragDirection, setDragDirection] = useState(null);
   const [initialTouchPosition, setInitialTouchPosition] = useState({ x: 0, y: 0 });
-  const [cubeRotation, setCubeRotation] = useState(0);
+  const [rotatePercent, setRotatePercent] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Refs for DOM manipulation
+  const sceneRef = useRef(null);
+  const cubeRef = useRef(null);
   
   // Motion values for animations
   const y = useMotionValue(0);
   const x = useMotionValue(0);
-  const rotationY = useMotionValue(0);
   
   const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
   const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
@@ -75,30 +79,23 @@ const StoryCube = (props) => {
   const opacity = useTransform(y, [0, viewportHeight * 0.5, viewportHeight], [1, 0.8, 0.4]);
   const borderRadius = useTransform(y, [0, viewportHeight * 0.2, viewportHeight / 2], ["0%", "15%", "30%"]);
   
-  // 3D Cube transforms
-  const cubeTransform = useTransform(
-    rotationY,
-    (value) => `translateZ(-50vw) rotateY(${value}deg)`
-  );
-  
   const controls = useAnimation();
-  const cubeControls = useAnimation();
 
   useEffect(() => {
     if (props.clicked) {
       document.body.style.overflow = 'hidden';
       y.set(0);
       x.set(0);
-      rotationY.set(0);
       setActiveStoryIndex(0);
       setIsLoading(true);
       setDragDirection(null);
-      setCubeRotation(0);
+      setRotatePercent(0);
+      setIsTransitioning(false);
       
-      // Initialize cube position
-      cubeControls.set({
-        rotateY: 0
-      });
+      // Initialize scene with CSS custom property
+      if (sceneRef.current) {
+        sceneRef.current.style.setProperty('--rotatePercent', '0');
+      }
       
       controls.set({
         y: 0,
@@ -125,6 +122,12 @@ const StoryCube = (props) => {
     setIsDragging(true);
     setDragDirection(null);
     setInitialTouchPosition({ x: info.point.x, y: info.point.y });
+    
+    // Remove transition class during drag for immediate response
+    if (cubeRef.current) {
+      cubeRef.current.classList.remove('cube-transition');
+    }
+    setIsTransitioning(false);
   };
 
   const handleDrag = (event, info) => {
@@ -140,22 +143,33 @@ const StoryCube = (props) => {
           setDragDirection('vertical');
         } else {
           setDragDirection('horizontal');
-          // For horizontal drag, update cube rotation in real-time
-          // CORRECTED: Cube should rotate in the SAME direction as the swipe
-          // Swipe right (positive deltaX) should rotate cube right (positive)
-          // Swipe left (negative deltaX) should rotate cube left (negative)
-          const dragProgress = info.offset.x / viewportWidth;
-          const rotationDelta = dragProgress * 90; // Direct mapping - cube follows finger
-          const newRotation = cubeRotation + rotationDelta;
-          rotationY.set(newRotation);
         }
       }
-    } else if (dragDirection === 'horizontal') {
-      // Continue real-time cube rotation during horizontal drag
-      const dragProgress = info.offset.x / viewportWidth;
-      const rotationDelta = dragProgress * 90; // Direct mapping - cube follows finger
-      const newRotation = cubeRotation + rotationDelta;
-      rotationY.set(newRotation);
+    }
+    
+    if (dragDirection === 'horizontal') {
+      // Calculate rotation percentage based on horizontal drag
+      let percentage = info.offset.x / viewportWidth;
+      
+      // Keep the transition smooth and responsive
+      if (percentage > 0.95) percentage = 0.95;
+      if (percentage < -0.95) percentage = -0.95;
+
+      // Prevent move to left for first story
+      if (activeStoryIndex === 0 && percentage > 0) {
+        percentage = 0;
+      }
+
+      // Prevent move to right for last story
+      if (activeStoryIndex === stories.length - 1 && percentage < 0) {
+        percentage = 0;
+      }
+
+      // Update CSS custom property for real-time rotation
+      if (sceneRef.current) {
+        sceneRef.current.style.setProperty('--rotatePercent', `${percentage}`);
+      }
+      setRotatePercent(percentage);
     }
   };
 
@@ -210,41 +224,47 @@ const StoryCube = (props) => {
         });
       }
     } else if (finalDragDirection === 'horizontal') {
-      // Handle 3D cube navigation
-      const threshold = viewportWidth * 0.25; // Reduced threshold for better UX
+      // Handle cube navigation with threshold-based snapping
+      const currentPercent = rotatePercent;
+      let finalPercent = 0;
       let newIndex = activeStoryIndex;
       
-      // Check if we should navigate based on threshold or velocity
-      if (Math.abs(deltaX) > threshold || Math.abs(info.velocity.x) > 500) {
-        // Instagram-style navigation (FINAL FIX):
-        // With natural cube rotation (cube follows finger):
-        // Swipe LEFT (deltaX < 0) = cube rotates left = reveals NEXT story (from right face)
-        // Swipe RIGHT (deltaX > 0) = cube rotates right = reveals PREVIOUS story (from left face)
-        if (deltaX < 0 && activeStoryIndex < stories.length - 1) {
-          newIndex = activeStoryIndex + 1; // Next story
-        } else if (deltaX > 0 && activeStoryIndex > 0) {
-          newIndex = activeStoryIndex - 1; // Previous story
+      // Determine final snap position based on threshold (50% like in the example)
+      if (Math.abs(currentPercent) > 0.5 && Math.abs(currentPercent) <= 1) {
+        if (currentPercent > 0) {
+          // Swipe right - go to previous story
+          finalPercent = 1;
+          if (activeStoryIndex > 0) {
+            newIndex = activeStoryIndex - 1;
+          }
+        } else {
+          // Swipe left - go to next story
+          finalPercent = -1;
+          if (activeStoryIndex < stories.length - 1) {
+            newIndex = activeStoryIndex + 1;
+          }
         }
+      } else {
+        // Snap back to center
+        finalPercent = 0;
       }
       
-      // Update active story index and cube rotation
-      setActiveStoryIndex(newIndex);
-      const targetRotation = -newIndex * 90; // Each story is 90 degrees apart
-      setCubeRotation(targetRotation);
+      // Add transition class for smooth snapping
+      if (cubeRef.current) {
+        cubeRef.current.classList.add('cube-transition');
+      }
+      setIsTransitioning(true);
       
-      // Animate cube to final position (whether changed or snapping back)
-      cubeControls.start({
-        rotateY: targetRotation,
-        transition: { 
-          type: "spring", 
-          stiffness: 800,
-          damping: 40,
-          duration: 0.25
-        }
-      });
+      // Update CSS custom property for final position
+      if (sceneRef.current) {
+        sceneRef.current.style.setProperty('--rotatePercent', `${finalPercent}`);
+      }
+      setRotatePercent(finalPercent);
       
-      // Reset the real-time rotation value to match the target
-      rotationY.set(targetRotation);
+      // Update active story index if changed
+      if (newIndex !== activeStoryIndex) {
+        setActiveStoryIndex(newIndex);
+      }
       
       // Also snap back vertical position
       controls.start({
@@ -262,41 +282,50 @@ const StoryCube = (props) => {
     }
   };
 
+  // Handle transition end to reset faces and prepare for next interaction
+  const handleTransitionEnd = useCallback(() => {
+    if (isTransitioning) {
+      // Reset to center position after transition
+      if (sceneRef.current) {
+        sceneRef.current.style.setProperty('--rotatePercent', '0');
+      }
+      setRotatePercent(0);
+      
+      // Remove transition class for immediate response on next drag
+      if (cubeRef.current) {
+        cubeRef.current.classList.remove('cube-transition');
+      }
+      setIsTransitioning(false);
+    }
+  }, [isTransitioning]);
+
   const handleKeyDown = useCallback((event) => {
     if (event.key === 'Escape') {
       handleClose();
     } else if (event.key === 'ArrowLeft' && activeStoryIndex > 0) {
       const newIndex = activeStoryIndex - 1;
       setActiveStoryIndex(newIndex);
-      const targetRotation = -newIndex * 90;
-      setCubeRotation(targetRotation);
-      cubeControls.start({
-        rotateY: targetRotation,
-        transition: { 
-          type: "spring", 
-          stiffness: 800,
-          damping: 40,
-          duration: 0.25
-        }
-      });
-      rotationY.set(targetRotation);
+      
+      // Animate with CSS transition
+      if (cubeRef.current && sceneRef.current) {
+        cubeRef.current.classList.add('cube-transition');
+        sceneRef.current.style.setProperty('--rotatePercent', '1');
+        setIsTransitioning(true);
+        setRotatePercent(1);
+      }
     } else if (event.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) {
       const newIndex = activeStoryIndex + 1;
       setActiveStoryIndex(newIndex);
-      const targetRotation = -newIndex * 90;
-      setCubeRotation(targetRotation);
-      cubeControls.start({
-        rotateY: targetRotation,
-        transition: { 
-          type: "spring", 
-          stiffness: 800,
-          damping: 40,
-          duration: 0.25
-        }
-      });
-      rotationY.set(targetRotation);
+      
+      // Animate with CSS transition
+      if (cubeRef.current && sceneRef.current) {
+        cubeRef.current.classList.add('cube-transition');
+        sceneRef.current.style.setProperty('--rotatePercent', '-1');
+        setIsTransitioning(true);
+        setRotatePercent(-1);
+      }
     }
-  }, [activeStoryIndex, cubeControls, rotationY]);
+  }, [activeStoryIndex]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -305,24 +334,16 @@ const StoryCube = (props) => {
 
   const onExitComplete = () => {
     setActiveStoryIndex(0);
-    setCubeRotation(0);
+    setRotatePercent(0);
+    setIsTransitioning(false);
     controls.stop();
-    cubeControls.stop();
     y.set(0);
     x.set(0);
-    rotationY.set(0);
   };
 
   // Get the three visible story faces for the cube
   const getVisibleStories = () => {
     const visibleStories = [];
-    
-    // Current story (front face)
-    visibleStories.push({
-      story: stories[activeStoryIndex],
-      index: activeStoryIndex,
-      position: 'front'
-    });
     
     // Previous story (left face)
     if (activeStoryIndex > 0) {
@@ -332,6 +353,13 @@ const StoryCube = (props) => {
         position: 'left'
       });
     }
+    
+    // Current story (front face)
+    visibleStories.push({
+      story: stories[activeStoryIndex],
+      index: activeStoryIndex,
+      position: 'front'
+    });
     
     // Next story (right face)
     if (activeStoryIndex < stories.length - 1) {
@@ -411,33 +439,34 @@ const StoryCube = (props) => {
             }}
           >
             {/* 3D Cube Scene */}
-            <motion.div
+            <div
+              ref={sceneRef}
               className="stories-scene"
               style={{
                 width: '100%',
-                height: '100%',
+                height: 'calc(100vh - 0px)', // Adjust if needed for mobile
                 position: 'relative',
                 transformStyle: 'preserve-3d',
+                '--rotatePercent': rotatePercent,
               }}
             >
               {/* 3D Cube Container */}
-              <motion.div
+              <div
+                ref={cubeRef}
                 className="stories-cube"
                 drag={dragDirection === 'vertical' ? false : "x"}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.1}
                 dragMomentum={false}
-                onDragStart={handleDragStart}
-                onDrag={handleDrag}
-                onDragEnd={handleDragEnd}
+                onTransitionEnd={handleTransitionEnd}
                 style={{
                   position: 'relative',
                   width: '100vw',
                   height: '100vh',
                   transformStyle: 'preserve-3d',
-                  transform: cubeTransform,
+                  transform: `translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))`,
+                  willChange: 'transform',
                 }}
-                animate={cubeControls}
               >
                 {/* Render cube faces */}
                 {visibleStories.map(({ story, index, position }) => {
@@ -445,29 +474,35 @@ const StoryCube = (props) => {
                   
                   switch (position) {
                     case 'left':
-                      faceTransform = 'rotateY(-90deg) translateZ(50vw)';
+                      faceTransform = 'rotateY(0deg) translateZ(50vw)';
                       break;
                     case 'front':
-                      faceTransform = 'rotateY(0deg) translateZ(50vw)';
-                      break;
-                    case 'right':
                       faceTransform = 'rotateY(90deg) translateZ(50vw)';
                       break;
+                    case 'right':
+                      faceTransform = 'rotateY(180deg) translateZ(50vw)';
+                      break;
                     default:
-                      faceTransform = 'rotateY(0deg) translateZ(50vw)';
+                      faceTransform = 'rotateY(90deg) translateZ(50vw)';
                   }
                   
                   return (
-                    <motion.div
+                    <div
                       key={`${index}-${position}`}
                       className="story-face"
                       style={{
                         position: 'absolute',
+                        top: 0,
+                        left: 0,
                         width: '100vw',
                         height: '100vh',
                         backfaceVisibility: 'hidden',
                         transform: faceTransform,
                         willChange: 'transform',
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center center',
+                        borderRadius: '8px',
                       }}
                     >
                       <Suspense fallback={
@@ -529,11 +564,11 @@ const StoryCube = (props) => {
                           />
                         )}
                       </Suspense>
-                    </motion.div>
+                    </div>
                   );
                 })}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
             
             {/* Close button */}
             <IconButton 
@@ -553,91 +588,6 @@ const StoryCube = (props) => {
             >
               <CloseIcon />
             </IconButton>
-            
-            {/* Debug info */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '1rem',
-                left: '1rem',
-                color: 'white',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                padding: '0.5rem',
-                borderRadius: '4px',
-                fontSize: '12px',
-                zIndex: 9999,
-              }}
-            >
-              3D Cube: Story {activeStoryIndex + 1} of {stories.length} | Rotation: {cubeRotation}°
-            </Box>
-            
-            {/* Direction indicator */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '3rem',
-                left: '1rem',
-                color: 'white',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                padding: '0.5rem',
-                borderRadius: '4px',
-                fontSize: '10px',
-                zIndex: 9999,
-              }}
-            >
-              Direction: {dragDirection || 'none'} | Dragging: {isDragging ? 'Yes' : 'No'}
-            </Box>
-
-            {/* Usage instructions */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '5rem',
-                left: '1rem',
-                color: 'white',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                padding: '0.5rem',
-                borderRadius: '4px',
-                fontSize: '10px',
-                zIndex: 9999,
-              }}
-            >
-              FIXED: Swipe LEFT for next story | Swipe RIGHT for previous | Swipe DOWN to dismiss
-            </Box>
-            
-            {/* Threshold indicator */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '7rem',
-                left: '1rem',
-                color: 'white',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                padding: '0.5rem',
-                borderRadius: '4px',
-                fontSize: '10px',
-                zIndex: 9999,
-              }}
-            >
-              Threshold: 25% ({Math.round(viewportWidth * 0.25)}px) | Target rotation: {Math.round(cubeRotation)}°
-            </Box>
-            
-            {/* Real-time rotation indicator */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '9rem',
-                left: '1rem',
-                color: 'white',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                padding: '0.5rem',
-                borderRadius: '4px',
-                fontSize: '10px',
-                zIndex: 9999,
-              }}
-            >
-              Live rotation: {Math.round(rotationY.get())}° | Active story: {activeStoryIndex}
-            </Box>
           </motion.div>
         </>
       )}
