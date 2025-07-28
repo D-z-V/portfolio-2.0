@@ -11,6 +11,7 @@ import staticStory from './staticStory.png';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import Story from '@/components/Stories/Story';
+import StoryCube from '@/components/Stories/StoryCube';
 import { useWindowSize } from "@uidotdev/usehooks";
 import { motion } from 'framer-motion';
 
@@ -19,6 +20,7 @@ const Stories = (props) => {
   const [iconPosition, setIconPosition] = React.useState({ top: 0, left: 0 });
   const [stories, setStories] = React.useState([]);
   const [animationIndex, setAnimationIndex] = React.useState(null);
+  const [use3DCube, setUse3DCube] = React.useState(false);
 
   const handleStoryClick = (index, position) => {
     console.log('Story clicked:', { index, position });
@@ -439,13 +441,50 @@ const Stories = (props) => {
         ))}
       </Box>
 
-      <Story 
-        clicked={activeIndex !== null} 
-        setActiveIndex={handleStoryClose}
-        storyId={activeIndex !== null ? `story-${activeIndex}` : null}
-        top={iconPosition.top}
-        left={iconPosition.left}
-      />
+      {/* 3D Cube Toggle Button */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '1rem',
+          right: '1rem',
+          zIndex: 10,
+        }}
+      >
+        <button
+          onClick={() => setUse3DCube(!use3DCube)}
+          style={{
+            backgroundColor: use3DCube ? '#007bff' : 'rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '8px',
+            padding: '8px 12px',
+            fontSize: '12px',
+            cursor: 'pointer',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          {use3DCube ? '3D Cube ON' : '3D Cube OFF'}
+        </button>
+      </Box>
+
+      {use3DCube ? (
+        <StoryCube 
+          clicked={activeIndex !== null} 
+          setActiveIndex={handleStoryClose}
+          storyId={activeIndex !== null ? `story-${activeIndex}` : null}
+          top={iconPosition.top}
+          left={iconPosition.left}
+        />
+      ) : (
+        <Story 
+          clicked={activeIndex !== null} 
+          setActiveIndex={handleStoryClose}
+          storyId={activeIndex !== null ? `story-${activeIndex}` : null}
+          top={iconPosition.top}
+          left={iconPosition.left}
+        />
+      )}
     </>
   );
 };
