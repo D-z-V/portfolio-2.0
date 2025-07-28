@@ -403,9 +403,10 @@ const StoryCube = (props) => {
           {/* Main container with swipe-to-dismiss */}
           <motion.div
             layoutId={props.storyId}
-            drag={dragDirection === 'horizontal' ? false : "y"}
-            dragConstraints={{ top: 0, bottom: viewportHeight }}
-            dragElastic={{ top: 0.2, bottom: 0.8 }}
+            drag={true}
+            dragConstraints={{ top: 0, bottom: viewportHeight, left: 0, right: 0 }}
+            dragElastic={{ top: 0.2, bottom: 0.8, left: 0.1, right: 0.1 }}
+            dragMomentum={false}
             onDragStart={handleDragStart}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
@@ -418,8 +419,8 @@ const StoryCube = (props) => {
               backgroundColor: 'black',
               zIndex: 9998,
               touchAction: 'none',
-              x: 0,
-              y,
+              x: dragDirection === 'horizontal' ? 0 : x,
+              y: dragDirection === 'vertical' ? y : 0,
               scale: isDragging ? 1 : scale,
               opacity: isDragging ? 1 : opacity,
               borderRadius: isDragging ? "0%" : borderRadius,
@@ -454,10 +455,6 @@ const StoryCube = (props) => {
               <div
                 ref={cubeRef}
                 className="stories-cube"
-                drag={dragDirection === 'vertical' ? false : "x"}
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.1}
-                dragMomentum={false}
                 onTransitionEnd={handleTransitionEnd}
                 style={{
                   position: 'relative',
