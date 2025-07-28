@@ -1,0 +1,189 @@
+/* 3D Cube Stories Component Styles */
+
+/* Loading spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Stories container - 3D perspective */
+.stories-container {
+  perspective: 300vw;
+  perspective-origin: center center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 3D Scene container */
+.stories-scene {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+/* 3D Cube container */
+.stories-cube {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  transform-style: preserve-3d;
+  transform: translateZ(-50vw) rotateY(0deg);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* Individual story faces */
+.story-face {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  backface-visibility: hidden;
+  will-change: transform;
+  /* Hardware acceleration */
+  transform: translate3d(0, 0, 0);
+}
+
+/* Face positions */
+.story-face.story-left {
+  transform: rotateY(-90deg) translateZ(50vw);
+}
+
+.story-face.story-front {
+  transform: rotateY(0deg) translateZ(50vw);
+}
+
+.story-face.story-right {
+  transform: rotateY(90deg) translateZ(50vw);
+}
+
+/* Smooth transitions */
+.stories-cube.transitioning {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Performance optimizations */
+.stories-cube * {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Touch optimizations */
+.story-container {
+  touch-action: pan-y;
+}
+
+.stories-cube {
+  touch-action: pan-x;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .story-face {
+    border: 2px solid white;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .stories-cube {
+    transition: none;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .stories-container {
+    perspective: 200vw;
+  }
+  
+  .stories-cube {
+    transform: translateZ(-25vw) rotateY(0deg);
+  }
+  
+  .story-face.story-left {
+    transform: rotateY(-90deg) translateZ(25vw);
+  }
+  
+  .story-face.story-front {
+    transform: rotateY(0deg) translateZ(25vw);
+  }
+  
+  .story-face.story-right {
+    transform: rotateY(90deg) translateZ(25vw);
+  }
+}
+
+/* Debug styles */
+.debug-info {
+  position: absolute;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 9999;
+  font-family: monospace;
+}
+
+/* Loading state */
+.story-loading {
+  background-color: #111;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Accessibility improvements */
+.story-face:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Prevent text selection during drag */
+.stories-cube {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Smooth gesture feedback */
+.story-face {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* Elastic bounce effect for boundaries */
+.stories-cube.bouncing {
+  animation: elasticBounce 0.3s ease-out;
+}
+
+@keyframes elasticBounce {
+  0% { transform: translateZ(-50vw) rotateY(var(--rotation)) scale(1); }
+  50% { transform: translateZ(-50vw) rotateY(var(--rotation)) scale(1.02); }
+  100% { transform: translateZ(-50vw) rotateY(var(--rotation)) scale(1); }
+}
