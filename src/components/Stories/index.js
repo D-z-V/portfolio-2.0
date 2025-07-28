@@ -276,10 +276,9 @@ const Stories = (props) => {
                       zIndex: activeIndex === index ? 0 : 1, // Lower z-index when active
                     }}
                     transition={{
-                      type: "spring",
-                      stiffness: 1000, // Very fast spring for quick dismiss
-                      damping: 60, // Less damping for snappy return
-                      duration: 0.1 // Quick dismiss animation
+                      type: "tween",
+                      ease: "easeOut",
+                      duration: 0.3
                     }}
                   >
                     <Box
@@ -349,10 +348,9 @@ const Stories = (props) => {
                             zIndex: activeIndex === index ? 0 : 1, // Lower z-index when active
                           }}
                           transition={{
-                            type: "spring",
-                            stiffness: 2000, // Very fast spring for quick dismiss
-                            damping: 20, // Less damping for snappy return
-                            duration: 0.1 // Quick dismiss animation
+                            type: "tween",
+                            ease: "easeOut",
+                            duration: 0.3
                           }}
                         >
                           <Image
@@ -408,10 +406,9 @@ const Stories = (props) => {
                             zIndex: activeIndex === index ? 0 : 1, // Lower z-index when active
                           }}
                           transition={{
-                            type: "spring",
-                            stiffness: 2000, // Very fast spring for quick dismiss
-                            damping: 20, // Less damping for snappy return
-                            duration: 0.1 // Quick dismiss animation
+                            type: "tween",
+                            ease: "easeOut",
+                            duration: 0.3
                           }}
                         >
                           <Image
