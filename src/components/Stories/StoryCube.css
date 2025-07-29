@@ -6,9 +6,9 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Stories container - 3D perspective */
+/* Stories container - 3D perspective (wider for Instagram-like feel) */
 .stories-container {
-  perspective: 300vw;
+  perspective: 150vw;
   perspective-origin: center center;
   width: 100vw;
   height: 100vh;
@@ -22,17 +22,19 @@
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  perspective: 300vw;
+  perspective: 150vw;
   perspective-origin: center center;
+  /* Smooth zoom transitions when not dragging */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 3D Cube container with real-time rotation support */
+/* 3D Cube container with real-time rotation support (wider angles for Instagram-like feel) */
 .stories-cube {
   position: relative;
   width: 100vw;
   height: 100vh;
   transform-style: preserve-3d;
-  transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 90deg * -1));
+  transform: translateZ(-40vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 60deg * -1));
   will-change: transform;
   /* No default transition - only when .cube-transition class is added */
 }
@@ -57,17 +59,17 @@
   border-radius: 8px;
 }
 
-/* Face positions - matching the CSS example structure */
+/* Face positions - wider angles for Instagram-like perspective */
 .story-face.story-left {
-  transform: rotateY(0deg) translateZ(50vw);
+  transform: rotateY(0deg) translateZ(40vw);
 }
 
 .story-face.story-front {
-  transform: rotateY(90deg) translateZ(50vw);
+  transform: rotateY(60deg) translateZ(40vw);
 }
 
 .story-face.story-right {
-  transform: rotateY(180deg) translateZ(50vw);
+  transform: rotateY(120deg) translateZ(40vw);
 }
 
 /* Performance optimizations */
@@ -110,27 +112,27 @@
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .stories-container {
-    perspective: 200vw;
+    perspective: 120vw;
   }
   
   .stories-scene {
-    perspective: 200vw;
+    perspective: 120vw;
   }
   
   .stories-cube {
-    transform: translateZ(-25vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 90deg * -1));
+    transform: translateZ(-30vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 60deg * -1));
   }
   
   .story-face.story-left {
-    transform: rotateY(0deg) translateZ(25vw);
+    transform: rotateY(0deg) translateZ(30vw);
   }
   
   .story-face.story-front {
-    transform: rotateY(90deg) translateZ(25vw);
+    transform: rotateY(60deg) translateZ(30vw);
   }
   
   .story-face.story-right {
-    transform: rotateY(180deg) translateZ(25vw);
+    transform: rotateY(120deg) translateZ(30vw);
   }
 }
 
@@ -190,12 +192,12 @@
 
 /* Real-time rotation support */
 .stories-scene[style*="--rotatePercent"] .stories-cube {
-  transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
+  transform: translateZ(-40vw) rotateY(calc((1 - var(--rotatePercent)) * 60deg * -1));
 }
 
 /* Mobile viewport adjustments for real-time rotation */
 @media (max-width: 768px) {
   .stories-scene[style*="--rotatePercent"] .stories-cube {
-    transform: translateZ(-25vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
+    transform: translateZ(-30vw) rotateY(calc((1 - var(--rotatePercent)) * 60deg * -1));
   }
 }
