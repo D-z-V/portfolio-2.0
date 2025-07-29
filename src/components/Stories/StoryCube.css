@@ -34,12 +34,16 @@
   transform-style: preserve-3d;
   transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 90deg * -1));
   will-change: transform;
+  /* Anti-flickering optimizations */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-origin: center center;
   /* No default transition - only when .cube-transition class is added */
 }
 
 /* Smooth transition class for snapping animations */
 .stories-cube.cube-transition {
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* Individual story faces */
@@ -48,13 +52,20 @@
   width: 100vw;
   height: 100vh;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   will-change: transform;
-  /* Hardware acceleration */
+  /* Hardware acceleration and anti-flickering */
   transform: translate3d(0, 0, 0);
+  transform-origin: center center;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
   border-radius: 8px;
+  /* Prevent content jumping */
+  overflow: hidden;
+  /* Smooth rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Face positions - matching the CSS example structure */
