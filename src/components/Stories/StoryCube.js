@@ -1,10 +1,132 @@
 import { Box, IconButton } from "@mui/material";
-import React, { useEffect, useState, lazy, Suspense, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { motion, useMotionValue, useTransform, AnimatePresence, useAnimation } from 'framer-motion';
 import './StoryCube.css';
 
-const StoriesLazy = React.lazy(() => import("react-insta-stories"));
+// Simple Story Component to replace react-insta-stories
+const SimpleStory = ({ story, isActive, isPaused }) => {
+  const [progress, setProgress] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  useEffect(() => {
+    if (!isActive || isPaused) {
+      setIsPlaying(false);
+      return;
+    }
+    
+    setIsPlaying(true);
+    const duration = story.duration || 5000;
+    const interval = 50; // Update every 50ms for smooth progress
+    const increment = (interval / duration) * 100;
+    
+    const timer = setInterval(() => {
+      setProgress(prev => {
+        const newProgress = prev + increment;
+        if (newProgress >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return newProgress;
+      });
+    }, interval);
+    
+    // Reset progress when story becomes active
+    if (isActive) {
+      setProgress(0);
+    }
+    
+    return () => clearInterval(timer);
+  }, [isActive, isPaused, story.duration]);
+  
+  return (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      position: 'relative',
+      backgroundImage: `url(${story.url})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      display: 'flex',
+      flexDirection: 'column',
+      borderRadius: '8px',
+      overflow: 'hidden'
+    }}>
+      {/* Progress bar */}
+      <div style={{
+        position: 'absolute',
+        top: '12px',
+        left: '12px',
+        right: '12px',
+        height: '3px',
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        borderRadius: '2px',
+        zIndex: 10
+      }}>
+        <div style={{
+          height: '100%',
+          width: `${progress}%`,
+          backgroundColor: 'white',
+          borderRadius: '2px',
+          transition: 'width 0.1s linear'
+        }} />
+      </div>
+      
+      {/* Header */}
+      {story.header && (
+        <div style={{
+          position: 'absolute',
+          top: '24px',
+          left: '12px',
+          right: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          zIndex: 10
+        }}>
+          <img 
+            src={story.header.profileImage} 
+            alt="Profile"
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              border: '2px solid white'
+            }}
+          />
+          <div>
+            <div style={{
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+            }}>
+              {story.header.heading}
+            </div>
+            <div style={{
+              color: 'rgba(255,255,255,0.8)',
+              fontSize: '12px',
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+            }}>
+              {story.header.subheading}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Story content area - just the background image */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        {/* Optional overlay content can go here */}
+      </div>
+    </div>
+  );
+};
 
 const stories = [
   {
@@ -140,7 +262,7 @@ const StoryCube = (props) => {
       // Reduce loading time
       setTimeout(() => {
         setIsLoading(false);
-      }, 200);
+      }, 100);
     }
     return () => {
       document.body.style.overflow = 'auto';
@@ -685,7 +807,7 @@ const StoryCube = (props) => {
                         borderRadius: '8px',
                       }}
                     >
-                      <Suspense fallback={
+                      {isLoading && position === 'front' ? (
                         <div style={{ 
                           backgroundColor: '#111', 
                           width: '100%', 
@@ -708,43 +830,14 @@ const StoryCube = (props) => {
                           }}></div>
                           Loading story...
                         </div>
-                      }>
-                        {isLoading && position === 'front' ? (
-                          <div style={{ 
-                            backgroundColor: '#111', 
-                            width: '100%', 
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontSize: '18px',
-                            flexDirection: 'column',
-                            gap: '1rem'
-                          }}>
-                            <div style={{
-                              width: '40px',
-                              height: '40px',
-                              border: '3px solid rgba(255,255,255,0.3)',
-                              borderTop: '3px solid white',
-                              borderRadius: '50%',
-                              animation: 'spin 1s linear infinite'
-                            }}></div>
-                            Loading story...
-                          </div>
-                        ) : (
-                          <StoriesLazy
-                            key={`story-content-${index}`}
-                            stories={[story]}
-                            defaultInterval={5000}
-                            height="100%"
-                            width="100%"
-                            storyContainerStyles={{ borderRadius: "8px", overflow: "hidden" }}
-                            loop={false}
-                            isPaused={!isActive}
-                          />
-                        )}
-                      </Suspense>
+                      ) : (
+                        <SimpleStory
+                          key={`story-content-${index}`}
+                          story={story}
+                          isActive={isActive}
+                          isPaused={!isActive}
+                        />
+                      )}
                     </div>
                   );
                 })}
