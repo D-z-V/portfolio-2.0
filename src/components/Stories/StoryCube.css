@@ -22,17 +22,24 @@
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
+  perspective: 300vw;
+  perspective-origin: center center;
 }
 
-/* 3D Cube container */
+/* 3D Cube container with real-time rotation support */
 .stories-cube {
   position: relative;
   width: 100vw;
   height: 100vh;
   transform-style: preserve-3d;
-  transform: translateZ(-50vw) rotateY(0deg);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 90deg * -1));
   will-change: transform;
+  /* No default transition - only when .cube-transition class is added */
+}
+
+/* Smooth transition class for snapping animations */
+.stories-cube.cube-transition {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Individual story faces */
@@ -44,24 +51,23 @@
   will-change: transform;
   /* Hardware acceleration */
   transform: translate3d(0, 0, 0);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border-radius: 8px;
 }
 
-/* Face positions */
+/* Face positions - matching the CSS example structure */
 .story-face.story-left {
-  transform: rotateY(-90deg) translateZ(50vw);
-}
-
-.story-face.story-front {
   transform: rotateY(0deg) translateZ(50vw);
 }
 
-.story-face.story-right {
+.story-face.story-front {
   transform: rotateY(90deg) translateZ(50vw);
 }
 
-/* Smooth transitions */
-.stories-cube.transitioning {
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+.story-face.story-right {
+  transform: rotateY(180deg) translateZ(50vw);
 }
 
 /* Performance optimizations */
@@ -90,8 +96,9 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .stories-cube {
-    transition: none;
+  .stories-cube,
+  .stories-cube.cube-transition {
+    transition: none !important;
   }
   
   @keyframes spin {
@@ -106,20 +113,24 @@
     perspective: 200vw;
   }
   
+  .stories-scene {
+    perspective: 200vw;
+  }
+  
   .stories-cube {
-    transform: translateZ(-25vw) rotateY(0deg);
+    transform: translateZ(-25vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 90deg * -1));
   }
   
   .story-face.story-left {
-    transform: rotateY(-90deg) translateZ(25vw);
-  }
-  
-  .story-face.story-front {
     transform: rotateY(0deg) translateZ(25vw);
   }
   
-  .story-face.story-right {
+  .story-face.story-front {
     transform: rotateY(90deg) translateZ(25vw);
+  }
+  
+  .story-face.story-right {
+    transform: rotateY(180deg) translateZ(25vw);
   }
 }
 
@@ -174,16 +185,17 @@
 
 /* Smooth gesture feedback */
 .story-face {
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
 }
 
-/* Elastic bounce effect for boundaries */
-.stories-cube.bouncing {
-  animation: elasticBounce 0.3s ease-out;
+/* Real-time rotation support */
+.stories-scene[style*="--rotatePercent"] .stories-cube {
+  transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
 }
 
-@keyframes elasticBounce {
-  0% { transform: translateZ(-50vw) rotateY(var(--rotation)) scale(1); }
-  50% { transform: translateZ(-50vw) rotateY(var(--rotation)) scale(1.02); }
-  100% { transform: translateZ(-50vw) rotateY(var(--rotation)) scale(1); }
+/* Mobile viewport adjustments for real-time rotation */
+@media (max-width: 768px) {
+  .stories-scene[style*="--rotatePercent"] .stories-cube {
+    transform: translateZ(-25vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
+  }
 }
