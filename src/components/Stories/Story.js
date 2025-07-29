@@ -176,32 +176,30 @@ const Story = (props) => {
           handleClose();
         } else {
           console.log('Snapping back - vertical threshold not met');
-          // Snap back to fullscreen with no horizontal movement
+          // Snap back to fullscreen with minimal spring and no bounce
           controls.start({
             y: 0,
             scale: 1,
             opacity: 1,
             borderRadius: "0%",
             transition: {
-              type: "spring",
-              stiffness: 1200,
-              damping: 50,
-              duration: 0.1
+              type: "tween",
+              ease: "easeOut",
+              duration: 0.2
             }
           });
         }
       } else {
-        // Upward vertical movement - just snap back
+        // Upward vertical movement - just snap back with no spring
         controls.start({
           y: 0,
           scale: 1,
           opacity: 1,
           borderRadius: "0%",
           transition: {
-            type: "spring",
-            stiffness: 1200,
-            damping: 50,
-            duration: 0.1
+            type: "tween",
+            ease: "easeOut",
+            duration: 0.2
           }
         });
       }
@@ -228,27 +226,25 @@ const Story = (props) => {
       
       setActiveStoryIndex(newIndex);
       
-      // Animate to the correct position
+      // Animate to the correct position with less spring
       horizontalControls.start({
         x: -newIndex * viewportWidth,
         transition: { 
-          type: "spring", 
-          stiffness: 800,
-          damping: 40,
-          duration: 0.15
+          type: "tween",
+          ease: "easeOut",
+          duration: 0.3
         }
       });
       
-      // Also snap back vertical position
+      // Also snap back vertical position with no spring
       controls.start({
         y: 0,
         scale: 1,
         opacity: 1,
         borderRadius: "0%",
         transition: {
-          type: "spring",
-          stiffness: 500,
-          damping: 30,
+          type: "tween",
+          ease: "easeOut",
           duration: 0.2
         }
       });
@@ -263,13 +259,13 @@ const Story = (props) => {
     // If drag was locked to vertical, ignore horizontal navigation completely
     if (finalDragDirection === 'vertical') {
       console.log('Ignoring horizontal navigation - was vertical drag');
-      // Snap back to current position
+      // Snap back to current position with no spring
       horizontalControls.start({
         x: -activeStoryIndex * viewportWidth,
         transition: { 
-          type: "spring", 
-          stiffness: 500,
-          damping: 30
+          type: "tween",
+          ease: "easeOut",
+          duration: 0.2
         }
       });
       return;
@@ -310,14 +306,13 @@ const Story = (props) => {
     
     setActiveStoryIndex(newIndex);
     
-    // Animate to the correct position
+    // Animate to the correct position with no spring
     horizontalControls.start({
       x: -newIndex * viewportWidth,
       transition: { 
-        type: "spring", 
-        stiffness: 800,
-        damping: 40,
-        duration: 0.15
+        type: "tween",
+        ease: "easeOut",
+        duration: 0.3
       }
     });
   };
@@ -331,10 +326,9 @@ const Story = (props) => {
       horizontalControls.start({
         x: -newIndex * viewportWidth,
         transition: { 
-          type: "spring", 
-          stiffness: 800,
-          damping: 40,
-          duration: 0.15
+          type: "tween",
+          ease: "easeOut",
+          duration: 0.3
         }
       });
     } else if (event.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) {
@@ -343,10 +337,9 @@ const Story = (props) => {
       horizontalControls.start({
         x: -newIndex * viewportWidth,
         transition: { 
-          type: "spring", 
-          stiffness: 800,
-          damping: 40,
-          duration: 0.15
+          type: "tween",
+          ease: "easeOut",
+          duration: 0.3
         }
       });
     }
@@ -379,6 +372,7 @@ const Story = (props) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             style={{
               position: 'fixed',
               top: 0,
@@ -398,6 +392,16 @@ const Story = (props) => {
             onDragStart={handleDragStart}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
+            initial={false}
+            exit={{
+              scale: 0.8,
+              opacity: 0,
+              transition: {
+                type: "tween",
+                ease: "easeIn",
+                duration: 0.2
+              }
+            }}
             style={{
               position: 'fixed',
               top: 0,
@@ -419,10 +423,11 @@ const Story = (props) => {
             }}
             animate={controls}
             transition={{
-              type: "spring",
-              stiffness: 600,
-              damping: 50,
-              duration: 0.05
+              layout: {
+                type: "tween",
+                ease: "easeOut",
+                duration: 0.4
+              }
             }}
           >
           {/* Horizontal Swipe Container */}
