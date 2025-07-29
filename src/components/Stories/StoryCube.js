@@ -128,27 +128,48 @@ const StoryCube = (props) => {
       cubeRef.current.classList.remove('cube-transition');
     }
     setIsTransitioning(false);
+    
+    // Reset motion values to ensure clean start
+    x.set(0);
+    y.set(0);
   };
 
   const handleDrag = (event, info) => {
+    // Immediate direction detection with smaller threshold
     if (!dragDirection) {
       const deltaX = Math.abs(info.offset.x);
       const deltaY = Math.abs(info.offset.y);
       const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      if (magnitude > 20) {
+      if (magnitude > 8) { // Much smaller threshold for immediate detection
         const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
         
-        if (angle >= 75 && angle <= 90) {
+        // More restrictive vertical detection - only pure vertical movements
+        if (angle >= 85 && angle <= 90) {
           setDragDirection('vertical');
         } else {
+          // Everything else is considered horizontal to prioritize cube navigation
           setDragDirection('horizontal');
         }
       }
     }
     
+    // Immediately block movement if horizontal is detected
     if (dragDirection === 'horizontal') {
-      // Calculate rotation percentage based on horizontal drag
+      // Aggressively block all container movement - force to 0 immediately
+      y.set(0);
+      x.set(0);
+      
+      // Also block the motion values in the style to prevent any visual movement
+      if (event.target) {
+        event.target.style.transform = 'translate3d(0px, 0px, 0px)';
+      }
+      
+      // Prevent any further motion value updates
+      event.preventDefault?.();
+      event.stopPropagation?.();
+      
+      // Calculate rotation percentage based on horizontal drag only
       let percentage = info.offset.x / viewportWidth;
       
       // Keep the transition smooth and responsive
@@ -403,9 +424,9 @@ const StoryCube = (props) => {
           {/* Main container with swipe-to-dismiss */}
           <motion.div
             layoutId={props.storyId}
-            drag={true}
-            dragConstraints={{ top: 0, bottom: viewportHeight, left: 0, right: 0 }}
-            dragElastic={{ top: 0.2, bottom: 0.8, left: 0.1, right: 0.1 }}
+            drag={dragDirection === 'horizontal' ? false : "y"}
+            dragConstraints={{ top: 0, bottom: viewportHeight }}
+            dragElastic={{ top: 0.2, bottom: 0.8 }}
             dragMomentum={false}
             onDragStart={handleDragStart}
             onDrag={handleDrag}
@@ -420,7 +441,7 @@ const StoryCube = (props) => {
               zIndex: 9998,
               touchAction: 'none',
               x: dragDirection === 'horizontal' ? 0 : x,
-              y: dragDirection === 'vertical' ? y : 0,
+              y: dragDirection === 'horizontal' ? 0 : y,
               scale: isDragging ? 1 : scale,
               opacity: isDragging ? 1 : opacity,
               borderRadius: isDragging ? "0%" : borderRadius,
@@ -439,18 +460,114 @@ const StoryCube = (props) => {
               duration: 0.05
             }}
           >
-            {/* 3D Cube Scene */}
+                        {/* Touch Handler for Horizontal Cube Rotation */}
             <div
-              ref={sceneRef}
-              className="stories-scene"
               style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
                 width: '100%',
-                height: 'calc(100vh - 0px)', // Adjust if needed for mobile
-                position: 'relative',
-                transformStyle: 'preserve-3d',
-                '--rotatePercent': rotatePercent,
+                height: '100%',
+                zIndex: 1,
+                touchAction: 'none',
+              }}
+              onTouchStart={(e) => {
+                if (dragDirection === 'vertical') return;
+                const touch = e.touches[0];
+                setInitialTouchPosition({ x: touch.clientX, y: touch.clientY });
+              }}
+              onTouchMove={(e) => {
+                if (dragDirection === 'vertical') return;
+                const touch = e.touches[0];
+                const deltaX = touch.clientX - initialTouchPosition.x;
+                const deltaY = touch.clientY - initialTouchPosition.y;
+                
+                // Detect direction if not already set
+                if (!dragDirection) {
+                  const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                  if (magnitude > 8) {
+                    const angle = Math.atan2(Math.abs(deltaY), Math.abs(deltaX)) * (180 / Math.PI);
+                    if (angle >= 85 && angle <= 90) {
+                      setDragDirection('vertical');
+                      return;
+                    } else {
+                      setDragDirection('horizontal');
+                    }
+                  }
+                }
+                
+                // Handle horizontal cube rotation
+                if (dragDirection === 'horizontal') {
+                  let percentage = deltaX / viewportWidth;
+                  
+                  if (percentage > 0.95) percentage = 0.95;
+                  if (percentage < -0.95) percentage = -0.95;
+
+                  if (activeStoryIndex === 0 && percentage > 0) {
+                    percentage = 0;
+                  }
+
+                  if (activeStoryIndex === stories.length - 1 && percentage < 0) {
+                    percentage = 0;
+                  }
+
+                  if (sceneRef.current) {
+                    sceneRef.current.style.setProperty('--rotatePercent', `${percentage}`);
+                  }
+                  setRotatePercent(percentage);
+                }
+              }}
+              onTouchEnd={(e) => {
+                if (dragDirection === 'horizontal') {
+                  // Handle cube navigation with threshold-based snapping
+                  const currentPercent = rotatePercent;
+                  let finalPercent = 0;
+                  let newIndex = activeStoryIndex;
+                  
+                  if (Math.abs(currentPercent) > 0.27 && Math.abs(currentPercent) <= 1) {
+                    if (currentPercent > 0) {
+                      finalPercent = 1;
+                      if (activeStoryIndex > 0) {
+                        newIndex = activeStoryIndex - 1;
+                      }
+                    } else {
+                      finalPercent = -1;
+                      if (activeStoryIndex < stories.length - 1) {
+                        newIndex = activeStoryIndex + 1;
+                      }
+                    }
+                  } else {
+                    finalPercent = 0;
+                  }
+                  
+                  if (cubeRef.current) {
+                    cubeRef.current.classList.add('cube-transition');
+                  }
+                  setIsTransitioning(true);
+                  
+                  if (sceneRef.current) {
+                    sceneRef.current.style.setProperty('--rotatePercent', `${finalPercent}`);
+                  }
+                  setRotatePercent(finalPercent);
+                  
+                  if (newIndex !== activeStoryIndex) {
+                    setActiveStoryIndex(newIndex);
+                  }
+                }
               }}
             >
+              {/* 3D Cube Scene */}
+              <div
+                ref={sceneRef}
+                className="stories-scene"
+                style={{
+                  width: '100%',
+                  height: 'calc(100vh - 0px)', // Adjust if needed for mobile
+                  position: 'relative',
+                  transformStyle: 'preserve-3d',
+                  '--rotatePercent': rotatePercent,
+                }}
+              >
               {/* 3D Cube Container */}
               <div
                 ref={cubeRef}
@@ -565,6 +682,7 @@ const StoryCube = (props) => {
                   );
                 })}
               </div>
+            </div>
             </div>
             
             {/* Close button */}
