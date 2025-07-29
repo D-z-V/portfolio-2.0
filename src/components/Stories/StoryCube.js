@@ -85,23 +85,25 @@ const StoryCube = (props) => {
 
   // Preload adjacent stories
   const preloadAdjacentStories = useCallback((centerIndex) => {
-    const toPreload = new Set(preloadedStories);
-    
-    // Always preload current story
-    toPreload.add(centerIndex);
-    
-    // Preload previous story if exists
-    if (centerIndex > 0) {
-      toPreload.add(centerIndex - 1);
-    }
-    
-    // Preload next story if exists
-    if (centerIndex < stories.length - 1) {
-      toPreload.add(centerIndex + 1);
-    }
-    
-    setPreloadedStories(toPreload);
-  }, [preloadedStories]);
+    setPreloadedStories(prevStories => {
+      const toPreload = new Set(prevStories);
+      
+      // Always preload current story
+      toPreload.add(centerIndex);
+      
+      // Preload previous story if exists
+      if (centerIndex > 0) {
+        toPreload.add(centerIndex - 1);
+      }
+      
+      // Preload next story if exists
+      if (centerIndex < stories.length - 1) {
+        toPreload.add(centerIndex + 1);
+      }
+      
+      return toPreload;
+    });
+  }, []);
 
   useEffect(() => {
     if (props.clicked) {
@@ -139,7 +141,7 @@ const StoryCube = (props) => {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [props.clicked, props.storyId, preloadAdjacentStories]);
+  }, [props.clicked, props.storyId]);
 
   const handleClose = () => {
     props.setActiveIndex(null);
@@ -397,7 +399,7 @@ const StoryCube = (props) => {
         setActiveStoryIndex(newIndex);
       }, 50);
     }
-  }, [activeStoryIndex, preloadAdjacentStories]);
+  }, [activeStoryIndex]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
