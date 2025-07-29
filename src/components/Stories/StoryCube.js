@@ -128,6 +128,10 @@ const StoryCube = (props) => {
       cubeRef.current.classList.remove('cube-transition');
     }
     setIsTransitioning(false);
+    
+    // Reset motion values to ensure clean start
+    x.set(0);
+    y.set(0);
   };
 
   const handleDrag = (event, info) => {
@@ -136,19 +140,28 @@ const StoryCube = (props) => {
       const deltaY = Math.abs(info.offset.y);
       const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
-      if (magnitude > 20) {
+      if (magnitude > 15) { // Reduced threshold for faster detection
         const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
         
-        if (angle >= 75 && angle <= 90) {
+        // More restrictive vertical detection - only pure vertical movements
+        if (angle >= 80 && angle <= 90) {
           setDragDirection('vertical');
         } else {
+          // Everything else is considered horizontal to prioritize cube navigation
           setDragDirection('horizontal');
         }
       }
     }
     
     if (dragDirection === 'horizontal') {
-      // Calculate rotation percentage based on horizontal drag
+      // When horizontal movement is detected, completely block all vertical movement
+      // Force y position to 0 to prevent any vertical displacement
+      y.set(0);
+      
+      // Also prevent any vertical motion values from being set
+      event.preventDefault?.();
+      
+      // Calculate rotation percentage based on horizontal drag only
       let percentage = info.offset.x / viewportWidth;
       
       // Keep the transition smooth and responsive
@@ -404,8 +417,18 @@ const StoryCube = (props) => {
           <motion.div
             layoutId={props.storyId}
             drag={true}
-            dragConstraints={{ top: 0, bottom: viewportHeight, left: 0, right: 0 }}
-            dragElastic={{ top: 0.2, bottom: 0.8, left: 0.1, right: 0.1 }}
+            dragConstraints={{ 
+              top: dragDirection === 'horizontal' ? 0 : 0, 
+              bottom: dragDirection === 'horizontal' ? 0 : viewportHeight, 
+              left: 0, 
+              right: 0 
+            }}
+            dragElastic={{ 
+              top: dragDirection === 'horizontal' ? 0 : 0.2, 
+              bottom: dragDirection === 'horizontal' ? 0 : 0.8, 
+              left: 0.1, 
+              right: 0.1 
+            }}
             dragMomentum={false}
             onDragStart={handleDragStart}
             onDrag={handleDrag}
@@ -420,7 +443,7 @@ const StoryCube = (props) => {
               zIndex: 9998,
               touchAction: 'none',
               x: dragDirection === 'horizontal' ? 0 : x,
-              y: dragDirection === 'vertical' ? y : 0,
+              y: dragDirection === 'horizontal' ? 0 : (dragDirection === 'vertical' ? y : 0),
               scale: isDragging ? 1 : scale,
               opacity: isDragging ? 1 : opacity,
               borderRadius: isDragging ? "0%" : borderRadius,
