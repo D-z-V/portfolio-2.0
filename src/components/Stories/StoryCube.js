@@ -230,7 +230,7 @@ const StoryCube = (props) => {
       let newIndex = activeStoryIndex;
       
       // Determine final snap position based on threshold (50% like in the example)
-      if (Math.abs(currentPercent) > 0.5 && Math.abs(currentPercent) <= 1) {
+      if (Math.abs(currentPercent) > 0.27 && Math.abs(currentPercent) <= 1) {
         if (currentPercent > 0) {
           // Swipe right - go to previous story
           finalPercent = 1;
