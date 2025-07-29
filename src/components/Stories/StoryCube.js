@@ -168,6 +168,9 @@ const StoryCube = (props) => {
       // Update CSS custom property for real-time rotation
       if (sceneRef.current) {
         sceneRef.current.style.setProperty('--rotatePercent', `${percentage}`);
+        // Apply zoom-out effect during horizontal movement
+        const zoomValue = 1 - (Math.abs(percentage) * 0.25); // Zoom out up to 25%
+        sceneRef.current.style.transform = `scale(${Math.max(zoomValue, 0.75)})`;
       }
       setRotatePercent(percentage);
     }
@@ -258,6 +261,9 @@ const StoryCube = (props) => {
       // Update CSS custom property for final position
       if (sceneRef.current) {
         sceneRef.current.style.setProperty('--rotatePercent', `${finalPercent}`);
+        // Apply zoom-out effect for final position
+        const finalZoomValue = 1 - (Math.abs(finalPercent) * 0.25);
+        sceneRef.current.style.transform = `scale(${Math.max(finalZoomValue, 0.75)})`;
       }
       setRotatePercent(finalPercent);
       
@@ -288,6 +294,8 @@ const StoryCube = (props) => {
       // Reset to center position after transition
       if (sceneRef.current) {
         sceneRef.current.style.setProperty('--rotatePercent', '0');
+        // Reset zoom to normal
+        sceneRef.current.style.transform = 'scale(1)';
       }
       setRotatePercent(0);
       
@@ -310,6 +318,8 @@ const StoryCube = (props) => {
       if (cubeRef.current && sceneRef.current) {
         cubeRef.current.classList.add('cube-transition');
         sceneRef.current.style.setProperty('--rotatePercent', '1');
+        // Apply zoom-out effect for keyboard navigation
+        sceneRef.current.style.transform = 'scale(0.75)';
         setIsTransitioning(true);
         setRotatePercent(1);
       }
@@ -321,6 +331,8 @@ const StoryCube = (props) => {
       if (cubeRef.current && sceneRef.current) {
         cubeRef.current.classList.add('cube-transition');
         sceneRef.current.style.setProperty('--rotatePercent', '-1');
+        // Apply zoom-out effect for keyboard navigation
+        sceneRef.current.style.transform = 'scale(0.75)';
         setIsTransitioning(true);
         setRotatePercent(-1);
       }
@@ -427,8 +439,8 @@ const StoryCube = (props) => {
               userSelect: 'none',
               WebkitUserSelect: 'none',
               overflow: 'hidden',
-              // 3D perspective for the cube
-              perspective: '300vw',
+              // 3D perspective for the cube (wider for Instagram-like feel)
+              perspective: '150vw',
               perspectiveOrigin: 'center center',
             }}
             animate={controls}
@@ -449,6 +461,8 @@ const StoryCube = (props) => {
                 position: 'relative',
                 transformStyle: 'preserve-3d',
                 '--rotatePercent': rotatePercent,
+                // Zoom effect is applied directly via style.transform in drag handlers
+                transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
               {/* 3D Cube Container */}
@@ -461,7 +475,8 @@ const StoryCube = (props) => {
                   width: '100vw',
                   height: '100vh',
                   transformStyle: 'preserve-3d',
-                  transform: `translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))`,
+                  // Use wider angles (60 degrees instead of 90) for Instagram-like perspective
+                  transform: `translateZ(-40vw) rotateY(calc((1 - var(--rotatePercent)) * 60deg * -1))`,
                   willChange: 'transform',
                 }}
               >
@@ -471,16 +486,16 @@ const StoryCube = (props) => {
                   
                   switch (position) {
                     case 'left':
-                      faceTransform = 'rotateY(0deg) translateZ(50vw)';
+                      faceTransform = 'rotateY(0deg) translateZ(40vw)';
                       break;
                     case 'front':
-                      faceTransform = 'rotateY(90deg) translateZ(50vw)';
+                      faceTransform = 'rotateY(60deg) translateZ(40vw)';
                       break;
                     case 'right':
-                      faceTransform = 'rotateY(180deg) translateZ(50vw)';
+                      faceTransform = 'rotateY(120deg) translateZ(40vw)';
                       break;
                     default:
-                      faceTransform = 'rotateY(90deg) translateZ(50vw)';
+                      faceTransform = 'rotateY(60deg) translateZ(40vw)';
                   }
                   
                   return (
