@@ -26,13 +26,12 @@
   perspective-origin: center center;
 }
 
-/* 3D Cube container with real-time rotation support */
+/* 3D Cube container with direct transform support */
 .stories-cube {
   position: relative;
   width: 100vw;
   height: 100vh;
   transform-style: preserve-3d;
-  transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 90deg * -1));
   will-change: transform;
   /* Anti-flickering optimizations */
   backface-visibility: hidden;
@@ -199,14 +198,19 @@
   transition: opacity 0.2s ease-in-out;
 }
 
-/* Real-time rotation support */
-.stories-scene[style*="--rotatePercent"] .stories-cube {
-  transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
+/* Real-time rotation support - removed CSS custom properties */
+.stories-scene {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 300vw;
+  perspective-origin: center center;
 }
 
-/* Mobile viewport adjustments for real-time rotation */
+/* Mobile viewport adjustments - removed CSS custom properties */
 @media (max-width: 768px) {
-  .stories-scene[style*="--rotatePercent"] .stories-cube {
-    transform: translateZ(-25vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
+  .stories-cube {
+    /* Mobile-specific transforms will be handled in JavaScript */
   }
 }

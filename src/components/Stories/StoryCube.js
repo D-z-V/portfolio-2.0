@@ -197,6 +197,8 @@ const StoryCube = (props) => {
   
   const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
   const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
+  const isMobile = viewportWidth <= 768;
+  const cubeDepth = isMobile ? 25 : 50; // Use smaller depth on mobile
   
   // Transforms for swipe-to-dismiss
   const scale = useTransform(y, [0, viewportHeight * 0.3, viewportHeight], [1, 0.9, 0.8]);
@@ -247,10 +249,8 @@ const StoryCube = (props) => {
       }
       setPreloadedStories(allStoriesToPreload);
       
-      // Initialize scene with CSS custom property
-      if (sceneRef.current) {
-        sceneRef.current.style.setProperty('--rotatePercent', '0');
-      }
+      // Initialize rotation
+      setRotatePercent(0);
       
       controls.set({
         y: 0,
@@ -431,10 +431,7 @@ const StoryCube = (props) => {
       }
       setIsTransitioning(true);
       
-      // Update CSS custom property for final position
-      if (sceneRef.current) {
-        sceneRef.current.style.setProperty('--rotatePercent', `${finalPercent}`);
-      }
+      // Update rotation for final position
       setRotatePercent(finalPercent);
       
       // Only update active story index AFTER the transition starts
@@ -467,9 +464,6 @@ const StoryCube = (props) => {
   const handleTransitionEnd = useCallback(() => {
     if (isTransitioning) {
       // Reset to center position after transition
-      if (sceneRef.current) {
-        sceneRef.current.style.setProperty('--rotatePercent', '0');
-      }
       setRotatePercent(0);
       
       // Remove transition class for immediate response on next drag
@@ -495,9 +489,8 @@ const StoryCube = (props) => {
       preloadAdjacentStories(newIndex);
       
       // Animate with CSS transition
-      if (cubeRef.current && sceneRef.current) {
+      if (cubeRef.current) {
         cubeRef.current.classList.add('cube-transition');
-        sceneRef.current.style.setProperty('--rotatePercent', '1');
         setIsTransitioning(true);
         setRotatePercent(1);
       }
@@ -511,9 +504,8 @@ const StoryCube = (props) => {
       preloadAdjacentStories(newIndex);
       
       // Animate with CSS transition
-      if (cubeRef.current && sceneRef.current) {
+      if (cubeRef.current) {
         cubeRef.current.classList.add('cube-transition');
-        sceneRef.current.style.setProperty('--rotatePercent', '-1');
         setIsTransitioning(true);
         setRotatePercent(-1);
       }
@@ -692,9 +684,6 @@ const StoryCube = (props) => {
                     percentage = 0;
                   }
 
-                  if (sceneRef.current) {
-                    sceneRef.current.style.setProperty('--rotatePercent', `${percentage}`);
-                  }
                   setRotatePercent(percentage);
                 }
               }}
@@ -726,9 +715,6 @@ const StoryCube = (props) => {
                   }
                   setIsTransitioning(true);
                   
-                  if (sceneRef.current) {
-                    sceneRef.current.style.setProperty('--rotatePercent', `${finalPercent}`);
-                  }
                   setRotatePercent(finalPercent);
                   
                   if (newIndex !== activeStoryIndex) {
@@ -750,7 +736,6 @@ const StoryCube = (props) => {
                   height: 'calc(100vh - 0px)', // Adjust if needed for mobile
                   position: 'relative',
                   transformStyle: 'preserve-3d',
-                  '--rotatePercent': rotatePercent,
                 }}
               >
               {/* 3D Cube Container */}
@@ -763,7 +748,7 @@ const StoryCube = (props) => {
                   width: '100vw',
                   height: '100vh',
                   transformStyle: 'preserve-3d',
-                  transform: `translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))`,
+                  transform: `translateZ(-${cubeDepth}vw) rotateY(${(1 - rotatePercent) * 90}deg)`,
                   willChange: 'transform',
                 }}
               >
@@ -773,16 +758,16 @@ const StoryCube = (props) => {
                   
                   switch (position) {
                     case 'left':
-                      faceTransform = 'rotateY(0deg) translateZ(50vw)';
+                      faceTransform = `rotateY(-90deg) translateZ(${cubeDepth}vw)`;
                       break;
                     case 'front':
-                      faceTransform = 'rotateY(90deg) translateZ(50vw)';
+                      faceTransform = `rotateY(0deg) translateZ(${cubeDepth}vw)`;
                       break;
                     case 'right':
-                      faceTransform = 'rotateY(180deg) translateZ(50vw)';
+                      faceTransform = `rotateY(90deg) translateZ(${cubeDepth}vw)`;
                       break;
                     default:
-                      faceTransform = 'rotateY(90deg) translateZ(50vw)';
+                      faceTransform = `rotateY(0deg) translateZ(${cubeDepth}vw)`;
                   }
                   
                   // Determine if this story should be active
