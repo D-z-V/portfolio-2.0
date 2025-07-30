@@ -37,9 +37,9 @@
   /* No default transition - only when .cube-transition class is added */
 }
 
-/* Smooth transition class for snapping animations */
+/* Smooth transition class for snapping animations - deterministic timing */
 .stories-cube.cube-transition {
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* Individual story faces */
@@ -183,9 +183,15 @@
   -ms-user-select: none;
 }
 
-/* Smooth gesture feedback */
+/* Prevent flickering during transitions */
 .story-face {
-  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+  transition: none;
+}
+
+/* Only apply opacity transitions when not in cube transition */
+.stories-cube:not(.cube-transition) .story-face {
+  transition: opacity 0.1s ease-in-out;
 }
 
 /* Real-time rotation support */

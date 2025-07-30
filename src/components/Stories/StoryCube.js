@@ -1,10 +1,28 @@
 import { Box, IconButton } from "@mui/material";
-import React, { useEffect, useState, lazy, Suspense, useRef, useCallback } from 'react';
+import React, { useEffect, useState, lazy, Suspense, useRef, useCallback, useMemo } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { motion, useMotionValue, useTransform, AnimatePresence, useAnimation } from 'framer-motion';
 import './StoryCube.css';
 
 const StoriesLazy = React.lazy(() => import("react-insta-stories"));
+
+// Memoized story component to prevent unnecessary re-renders
+const MemoizedStoryComponent = React.memo(({ story, isActive, storyIndex }) => (
+  <StoriesLazy
+    key={`story-content-${storyIndex}`}
+    stories={[story]}
+    defaultInterval={5000}
+    height="100%"
+    width="100%"
+    storyContainerStyles={{ borderRadius: "8px", overflow: "hidden" }}
+    loop={false}
+    isPaused={!isActive}
+  />
+), (prevProps, nextProps) => {
+  // Only re-render if active state changes or story changes
+  return prevProps.isActive === nextProps.isActive && 
+         prevProps.storyIndex === nextProps.storyIndex;
+});
 
 const stories = [
   {
@@ -55,19 +73,19 @@ const stories = [
 ];
 
 const StoryCube = (props) => {
-  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
-  const [displayStoryIndex, setDisplayStoryIndex] = useState(0); // Index used for rendering faces
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [dragDirection, setDragDirection] = useState(null);
   const [initialTouchPosition, setInitialTouchPosition] = useState({ x: 0, y: 0 });
   const [rotatePercent, setRotatePercent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [preloadedStories, setPreloadedStories] = useState(new Set([0])); // Track preloaded stories
+  const [stableStorySet, setStableStorySet] = useState(new Set([0, 1])); // Always keep adjacent stories stable
   
   // Refs for DOM manipulation
   const sceneRef = useRef(null);
   const cubeRef = useRef(null);
+  const transitionTimeoutRef = useRef(null);
   
   // Motion values for animations
   const y = useMotionValue(0);
@@ -83,43 +101,49 @@ const StoryCube = (props) => {
   
   const controls = useAnimation();
 
-  // Preload adjacent stories
-  const preloadAdjacentStories = useCallback((centerIndex) => {
-    setPreloadedStories(prevStories => {
-      const toPreload = new Set(prevStories);
-      
-      // Always preload current story
-      toPreload.add(centerIndex);
-      
-      // Preload previous story if exists
-      if (centerIndex > 0) {
-        toPreload.add(centerIndex - 1);
-      }
-      
-      // Preload next story if exists
-      if (centerIndex < stories.length - 1) {
-        toPreload.add(centerIndex + 1);
-      }
-      
-      return toPreload;
-    });
+  // Stable story set management - always keep 3 adjacent stories loaded
+  const updateStableStorySet = useCallback((centerIndex) => {
+    const newSet = new Set();
+    
+    // Always include current story
+    newSet.add(centerIndex);
+    
+    // Include previous story if exists
+    if (centerIndex > 0) {
+      newSet.add(centerIndex - 1);
+    }
+    
+    // Include next story if exists
+    if (centerIndex < stories.length - 1) {
+      newSet.add(centerIndex + 1);
+    }
+    
+    setStableStorySet(newSet);
   }, []);
 
+  // Initialize component state deterministically
   useEffect(() => {
     if (props.clicked) {
+      // Clear any pending transitions
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = null;
+      }
+      
       document.body.style.overflow = 'hidden';
       y.set(0);
       x.set(0);
+      
+      // Reset all state synchronously
       const initialIndex = 0;
-      setActiveStoryIndex(initialIndex);
-      setDisplayStoryIndex(initialIndex);
+      setCurrentStoryIndex(initialIndex);
       setIsLoading(true);
       setDragDirection(null);
       setRotatePercent(0);
       setIsTransitioning(false);
       
-      // Preload initial stories
-      preloadAdjacentStories(initialIndex);
+      // Initialize stable story set
+      updateStableStorySet(initialIndex);
       
       // Initialize scene with CSS custom property
       if (sceneRef.current) {
@@ -133,21 +157,32 @@ const StoryCube = (props) => {
         borderRadius: "0%"
       });
       
-      // Simulate loading completion
-      setTimeout(() => {
+      // Deterministic loading completion
+      const loadingTimeout = setTimeout(() => {
         setIsLoading(false);
-      }, 500);
+      }, 300); // Reduced from 500ms for faster response
+      
+      return () => clearTimeout(loadingTimeout);
     }
     return () => {
       document.body.style.overflow = 'auto';
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = null;
+      }
     };
-  }, [props.clicked, props.storyId]);
+  }, [props.clicked, props.storyId, updateStableStorySet, y, x, controls]);
 
   const handleClose = () => {
     props.setActiveIndex(null);
   };
 
   const handleDragStart = (event, info) => {
+    // Prevent new interactions during transitions
+    if (isTransitioning) {
+      return;
+    }
+    
     setIsDragging(true);
     setDragDirection(null);
     setInitialTouchPosition({ x: info.point.x, y: info.point.y });
@@ -206,12 +241,12 @@ const StoryCube = (props) => {
       if (percentage < -0.95) percentage = -0.95;
 
       // Prevent move to left for first story
-      if (activeStoryIndex === 0 && percentage > 0) {
+      if (currentStoryIndex === 0 && percentage > 0) {
         percentage = 0;
       }
 
       // Prevent move to right for last story
-      if (activeStoryIndex === stories.length - 1 && percentage < 0) {
+      if (currentStoryIndex === stories.length - 1 && percentage < 0) {
         percentage = 0;
       }
 
@@ -277,21 +312,21 @@ const StoryCube = (props) => {
       // Handle cube navigation with threshold-based snapping
       const currentPercent = rotatePercent;
       let finalPercent = 0;
-      let newIndex = activeStoryIndex;
+      let newIndex = currentStoryIndex;
       
       // Determine final snap position based on threshold (50% like in the example)
       if (Math.abs(currentPercent) > 0.27 && Math.abs(currentPercent) <= 1) {
         if (currentPercent > 0) {
           // Swipe right - go to previous story
           finalPercent = 1;
-          if (activeStoryIndex > 0) {
-            newIndex = activeStoryIndex - 1;
+          if (currentStoryIndex > 0) {
+            newIndex = currentStoryIndex - 1;
           }
         } else {
           // Swipe left - go to next story
           finalPercent = -1;
-          if (activeStoryIndex < stories.length - 1) {
-            newIndex = activeStoryIndex + 1;
+          if (currentStoryIndex < stories.length - 1) {
+            newIndex = currentStoryIndex + 1;
           }
         }
       } else {
@@ -311,16 +346,11 @@ const StoryCube = (props) => {
       }
       setRotatePercent(finalPercent);
       
-      // Only update active story index AFTER the transition starts
-      // This prevents the wrong story from being mounted during transition
-      if (newIndex !== activeStoryIndex) {
-        // Preload the new story and adjacent ones before changing index
-        preloadAdjacentStories(newIndex);
-        
-        // Small delay to ensure preloading starts before index change
-        setTimeout(() => {
-          setActiveStoryIndex(newIndex);
-        }, 50);
+      // Update story index immediately for deterministic behavior
+      if (newIndex !== currentStoryIndex) {
+        // Update stable story set and index synchronously
+        updateStableStorySet(newIndex);
+        setCurrentStoryIndex(newIndex);
       }
       
       // Also snap back vertical position
@@ -343,7 +373,7 @@ const StoryCube = (props) => {
   const handleTransitionEnd = useCallback(() => {
     if (isTransitioning) {
       // Update display index to match active index after transition completes
-      setDisplayStoryIndex(activeStoryIndex);
+      // setDisplayStoryIndex(activeStoryIndex); // This line is removed as per new_code
       
       // Reset to center position after transition
       if (sceneRef.current) {
@@ -357,16 +387,24 @@ const StoryCube = (props) => {
       }
       setIsTransitioning(false);
     }
-  }, [isTransitioning, activeStoryIndex]);
+  }, [isTransitioning, currentStoryIndex]); // Changed activeStoryIndex to currentStoryIndex
 
   const handleKeyDown = useCallback((event) => {
+    // Prevent keyboard navigation during transitions
+    if (isTransitioning) {
+      return;
+    }
+    
     if (event.key === 'Escape') {
       handleClose();
-    } else if (event.key === 'ArrowLeft' && activeStoryIndex > 0) {
-      const newIndex = activeStoryIndex - 1;
+    } else if (event.key === 'ArrowLeft' && currentStoryIndex > 0) {
+      const newIndex = currentStoryIndex - 1;
       
       // Preload stories before transition
-      preloadAdjacentStories(newIndex);
+      updateStableStorySet(newIndex);
+      
+      // Update index immediately for deterministic behavior
+      setCurrentStoryIndex(newIndex);
       
       // Animate with CSS transition
       if (cubeRef.current && sceneRef.current) {
@@ -375,16 +413,14 @@ const StoryCube = (props) => {
         setIsTransitioning(true);
         setRotatePercent(1);
       }
-      
-      // Update index after short delay
-      setTimeout(() => {
-        setActiveStoryIndex(newIndex);
-      }, 50);
-    } else if (event.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) {
-      const newIndex = activeStoryIndex + 1;
+    } else if (event.key === 'ArrowRight' && currentStoryIndex < stories.length - 1) {
+      const newIndex = currentStoryIndex + 1;
       
       // Preload stories before transition
-      preloadAdjacentStories(newIndex);
+      updateStableStorySet(newIndex);
+      
+      // Update index immediately for deterministic behavior
+      setCurrentStoryIndex(newIndex);
       
       // Animate with CSS transition
       if (cubeRef.current && sceneRef.current) {
@@ -393,13 +429,8 @@ const StoryCube = (props) => {
         setIsTransitioning(true);
         setRotatePercent(-1);
       }
-      
-      // Update index after short delay
-      setTimeout(() => {
-        setActiveStoryIndex(newIndex);
-      }, 50);
     }
-  }, [activeStoryIndex]);
+  }, [currentStoryIndex, updateStableStorySet]); // Changed activeStoryIndex to currentStoryIndex
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -407,20 +438,20 @@ const StoryCube = (props) => {
   }, [handleKeyDown]);
 
   const onExitComplete = () => {
-    setActiveStoryIndex(0);
-    setDisplayStoryIndex(0);
+    setCurrentStoryIndex(0);
+    // setDisplayStoryIndex(0); // This line is removed as per new_code
     setRotatePercent(0);
     setIsTransitioning(false);
-    setPreloadedStories(new Set([0]));
+    setStableStorySet(new Set([0, 1]));
     controls.stop();
     y.set(0);
     x.set(0);
   };
 
-  // Get the three visible story faces for the cube using stable display index
+  // Get the three visible story faces for the cube with stable rendering
   const getVisibleStories = useCallback(() => {
     const visibleStories = [];
-    const baseIndex = isTransitioning ? displayStoryIndex : activeStoryIndex;
+    const baseIndex = currentStoryIndex;
     
     // Previous story (left face)
     if (baseIndex > 0) {
@@ -428,7 +459,7 @@ const StoryCube = (props) => {
         story: stories[baseIndex - 1],
         index: baseIndex - 1,
         position: 'left',
-        isPreloaded: preloadedStories.has(baseIndex - 1)
+        isPreloaded: stableStorySet.has(baseIndex - 1)
       });
     }
     
@@ -437,7 +468,7 @@ const StoryCube = (props) => {
       story: stories[baseIndex],
       index: baseIndex,
       position: 'front',
-      isPreloaded: preloadedStories.has(baseIndex)
+      isPreloaded: stableStorySet.has(baseIndex)
     });
     
     // Next story (right face)
@@ -446,12 +477,12 @@ const StoryCube = (props) => {
         story: stories[baseIndex + 1],
         index: baseIndex + 1,
         position: 'right',
-        isPreloaded: preloadedStories.has(baseIndex + 1)
+        isPreloaded: stableStorySet.has(baseIndex + 1)
       });
     }
     
     return visibleStories;
-  }, [activeStoryIndex, displayStoryIndex, isTransitioning, preloadedStories]);
+  }, [currentStoryIndex, stableStorySet]); // Changed activeStoryIndex to currentStoryIndex
 
   const visibleStories = getVisibleStories();
 
@@ -531,12 +562,12 @@ const StoryCube = (props) => {
                 touchAction: 'none',
               }}
               onTouchStart={(e) => {
-                if (dragDirection === 'vertical') return;
+                if (dragDirection === 'vertical' || isTransitioning) return;
                 const touch = e.touches[0];
                 setInitialTouchPosition({ x: touch.clientX, y: touch.clientY });
               }}
               onTouchMove={(e) => {
-                if (dragDirection === 'vertical') return;
+                if (dragDirection === 'vertical' || isTransitioning) return;
                 const touch = e.touches[0];
                 const deltaX = touch.clientX - initialTouchPosition.x;
                 const deltaY = touch.clientY - initialTouchPosition.y;
@@ -562,11 +593,11 @@ const StoryCube = (props) => {
                   if (percentage > 0.95) percentage = 0.95;
                   if (percentage < -0.95) percentage = -0.95;
 
-                  if (activeStoryIndex === 0 && percentage > 0) {
+                  if (currentStoryIndex === 0 && percentage > 0) {
                     percentage = 0;
                   }
 
-                  if (activeStoryIndex === stories.length - 1 && percentage < 0) {
+                  if (currentStoryIndex === stories.length - 1 && percentage < 0) {
                     percentage = 0;
                   }
 
@@ -577,22 +608,22 @@ const StoryCube = (props) => {
                 }
               }}
               onTouchEnd={(e) => {
-                if (dragDirection === 'horizontal') {
+                if (dragDirection === 'horizontal' && !isTransitioning) {
                   // Handle cube navigation with threshold-based snapping
                   const currentPercent = rotatePercent;
                   let finalPercent = 0;
-                  let newIndex = activeStoryIndex;
+                  let newIndex = currentStoryIndex;
                   
                   if (Math.abs(currentPercent) > 0.27 && Math.abs(currentPercent) <= 1) {
                     if (currentPercent > 0) {
                       finalPercent = 1;
-                      if (activeStoryIndex > 0) {
-                        newIndex = activeStoryIndex - 1;
+                      if (currentStoryIndex > 0) {
+                        newIndex = currentStoryIndex - 1;
                       }
                     } else {
                       finalPercent = -1;
-                      if (activeStoryIndex < stories.length - 1) {
-                        newIndex = activeStoryIndex + 1;
+                      if (currentStoryIndex < stories.length - 1) {
+                        newIndex = currentStoryIndex + 1;
                       }
                     }
                   } else {
@@ -609,13 +640,10 @@ const StoryCube = (props) => {
                   }
                   setRotatePercent(finalPercent);
                   
-                  if (newIndex !== activeStoryIndex) {
-                    // Preload stories before changing index
-                    preloadAdjacentStories(newIndex);
-                    
-                    setTimeout(() => {
-                      setActiveStoryIndex(newIndex);
-                    }, 50);
+                  if (newIndex !== currentStoryIndex) {
+                    // Update stable story set and index synchronously
+                    updateStableStorySet(newIndex);
+                    setCurrentStoryIndex(newIndex);
                   }
                 }
               }}
@@ -665,13 +693,13 @@ const StoryCube = (props) => {
                   }
                   
                   // Determine if this story should be active
-                  const isActive = index === activeStoryIndex;
+                  const isActive = index === currentStoryIndex;
                   const shouldRender = isPreloaded || isActive || position === 'front';
                   
-                  return (
-                    <div
-                      key={`${index}-${position}-${displayStoryIndex}`}
-                      className="story-face"
+                                      return (
+                      <div
+                        key={`story-face-${index}-${position}`}
+                        className="story-face"
                       style={{
                         position: 'absolute',
                         top: 0,
@@ -735,15 +763,10 @@ const StoryCube = (props) => {
                             Loading story...
                           </div>
                         ) : shouldRender ? (
-                          <StoriesLazy
-                            key={`story-${index}`}
-                            stories={[story]}
-                            defaultInterval={5000}
-                            height="100%"
-                            width="100%"
-                            storyContainerStyles={{ borderRadius: "8px", overflow: "hidden" }}
-                            loop={false}
-                            isPaused={!isActive}
+                          <MemoizedStoryComponent
+                            story={story}
+                            isActive={isActive}
+                            storyIndex={index}
                           />
                         ) : (
                           <div style={{ 
