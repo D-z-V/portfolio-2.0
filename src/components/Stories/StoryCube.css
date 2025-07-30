@@ -35,6 +35,8 @@
   transform: translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent, 0)) * 90deg * -1));
   will-change: transform;
   /* No default transition - only when .cube-transition class is added */
+  /* Prevent layout recalculation during transforms */
+  contain: layout style paint;
 }
 
 /* Smooth transition class for snapping animations */
@@ -55,6 +57,13 @@
   background-repeat: no-repeat;
   background-position: center center;
   border-radius: 8px;
+  /* Ensure faces are always rendered to prevent flashing */
+  transform-style: preserve-3d;
+  /* Prevent layout recalculation */
+  contain: layout style paint;
+  /* Keep faces visible to prevent flashing */
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* Face positions - matching the CSS example structure */
@@ -76,6 +85,17 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform: translate3d(0, 0, 0);
+  /* Prevent text selection flicker */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent content shift during transitions */
+.story-face > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Touch optimizations */
@@ -183,9 +203,10 @@
   -ms-user-select: none;
 }
 
-/* Smooth gesture feedback */
+/* Smooth gesture feedback - removed to prevent interference */
 .story-face {
-  transition: opacity 0.2s ease-in-out;
+  /* Remove any transition on faces themselves */
+  transition: none !important;
 }
 
 /* Real-time rotation support */
@@ -198,4 +219,16 @@
   .stories-scene[style*="--rotatePercent"] .stories-cube {
     transform: translateZ(-25vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1));
   }
+}
+
+/* Ensure story content doesn't cause reflow */
+.story-face iframe,
+.story-face img,
+.story-face video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
