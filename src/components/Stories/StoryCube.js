@@ -1,14 +1,136 @@
 import { Box, IconButton } from "@mui/material";
-import React, { useEffect, useState, lazy, Suspense, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { motion, useMotionValue, useTransform, AnimatePresence, useAnimation } from 'framer-motion';
 import './StoryCube.css';
 
-const StoriesLazy = React.lazy(() => import("react-insta-stories"));
+// Simple Story Component to replace react-insta-stories
+const SimpleStory = ({ story, isActive, isPaused }) => {
+  const [progress, setProgress] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  useEffect(() => {
+    if (!isActive || isPaused) {
+      setIsPlaying(false);
+      return;
+    }
+    
+    setIsPlaying(true);
+    const duration = story.duration || 5000;
+    const interval = 50; // Update every 50ms for smooth progress
+    const increment = (interval / duration) * 100;
+    
+    const timer = setInterval(() => {
+      setProgress(prev => {
+        const newProgress = prev + increment;
+        if (newProgress >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return newProgress;
+      });
+    }, interval);
+    
+    // Reset progress when story becomes active
+    if (isActive) {
+      setProgress(0);
+    }
+    
+    return () => clearInterval(timer);
+  }, [isActive, isPaused, story.duration]);
+  
+  return (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      position: 'relative',
+      backgroundImage: `url(${story.url})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      display: 'flex',
+      flexDirection: 'column',
+      borderRadius: '8px',
+      overflow: 'hidden'
+    }}>
+      {/* Progress bar */}
+      <div style={{
+        position: 'absolute',
+        top: '12px',
+        left: '12px',
+        right: '12px',
+        height: '3px',
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        borderRadius: '2px',
+        zIndex: 10
+      }}>
+        <div style={{
+          height: '100%',
+          width: `${progress}%`,
+          backgroundColor: 'white',
+          borderRadius: '2px',
+          transition: 'width 0.1s linear'
+        }} />
+      </div>
+      
+      {/* Header */}
+      {story.header && (
+        <div style={{
+          position: 'absolute',
+          top: '24px',
+          left: '12px',
+          right: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          zIndex: 10
+        }}>
+          <img 
+            src={story.header.profileImage} 
+            alt="Profile"
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              border: '2px solid white'
+            }}
+          />
+          <div>
+            <div style={{
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+            }}>
+              {story.header.heading}
+            </div>
+            <div style={{
+              color: 'rgba(255,255,255,0.8)',
+              fontSize: '12px',
+              textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+            }}>
+              {story.header.subheading}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Story content area - just the background image */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        {/* Optional overlay content can go here */}
+      </div>
+    </div>
+  );
+};
 
 const stories = [
   {
-    url: 'https://picsum.photos/1080/1920',
+    url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTA4MCAxOTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQxIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNGY0NmU1O3N0b3Atb3BhY2l0eToxIiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzA2YjZkNDtzdG9wLW9wYWNpdHk6MSIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiBmaWxsPSJ1cmwoI2dyYWRpZW50MSkiLz48L3N2Zz4=',
     duration: 5000,
     header: {
       heading: 'NextJS',
@@ -17,7 +139,7 @@ const stories = [
     },
   },
   {
-    url: 'https://picsum.photos/1280/1920',
+    url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTI4MCAxOTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQyIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZWM0ODk5O3N0b3Atb3BhY2l0eToxIiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2Y5N2MxNjtzdG9wLW9wYWNpdHk6MSIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4MCIgaGVpZ2h0PSIxOTIwIiBmaWxsPSJ1cmwoI2dyYWRpZW50MikiLz48L3N2Zz4=',
     duration: 5000,
     header: {
       heading: 'ReactJS',
@@ -26,7 +148,7 @@ const stories = [
     },
   },
   {
-    url: 'https://picsum.photos/1180/1920',
+    url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTE4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTE4MCAxOTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQzIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMTBiOTgxO3N0b3Atb3BhY2l0eToxIiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzA1OWY3ZTtzdG9wLW9wYWNpdHk6MSIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTE4MCIgaGVpZ2h0PSIxOTIwIiBmaWxsPSJ1cmwoI2dyYWRpZW50MykiLz48L3N2Zz4=',
     duration: 5000,
     header: {
       heading: 'NodeJS',
@@ -35,7 +157,7 @@ const stories = [
     },
   },
   {
-    url: 'https://picsum.photos/1480/1920',
+    url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTQ4MCAxOTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQ0IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOGI1Y2Y2O3N0b3Atb3BhY2l0eToxIiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzA5OGZkZjtzdG9wLW9wYWNpdHk6MSIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTQ4MCIgaGVpZ2h0PSIxOTIwIiBmaWxsPSJ1cmwoI2dyYWRpZW50NCkiLz48L3N2Zz4=',
     duration: 5000,
     header: {
       heading: 'MongoDB',
@@ -44,7 +166,7 @@ const stories = [
     },
   },
   {
-    url: 'https://picsum.photos/1080/1920',
+    url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTA4MCAxOTIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQ1IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZmY3MDQ3O3N0b3Atb3BhY2l0eToxIiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2VmNDQ0NDtzdG9wLW9wYWNpdHk6MSIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiBmaWxsPSJ1cmwoI2dyYWRpZW50NSkiLz48L3N2Zz4=',
     duration: 5000,
     header: {
       heading: 'PyTorch',
@@ -75,6 +197,8 @@ const StoryCube = (props) => {
   
   const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
   const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
+  const isMobile = viewportWidth <= 768;
+  const cubeDepth = isMobile ? 25 : 50; // Use smaller depth on mobile
   
   // Transforms for swipe-to-dismiss
   const scale = useTransform(y, [0, viewportHeight * 0.3, viewportHeight], [1, 0.9, 0.8]);
@@ -118,13 +242,15 @@ const StoryCube = (props) => {
       setRotatePercent(0);
       setIsTransitioning(false);
       
-      // Preload initial stories
-      preloadAdjacentStories(initialIndex);
-      
-      // Initialize scene with CSS custom property
-      if (sceneRef.current) {
-        sceneRef.current.style.setProperty('--rotatePercent', '0');
+      // Preload all stories immediately to prevent loading states
+      const allStoriesToPreload = new Set();
+      for (let i = 0; i < Math.min(stories.length, 3); i++) {
+        allStoriesToPreload.add(i);
       }
+      setPreloadedStories(allStoriesToPreload);
+      
+      // Initialize rotation
+      setRotatePercent(0);
       
       controls.set({
         y: 0,
@@ -133,10 +259,10 @@ const StoryCube = (props) => {
         borderRadius: "0%"
       });
       
-      // Simulate loading completion
+      // Reduce loading time
       setTimeout(() => {
         setIsLoading(false);
-      }, 500);
+      }, 100);
     }
     return () => {
       document.body.style.overflow = 'auto';
@@ -305,10 +431,7 @@ const StoryCube = (props) => {
       }
       setIsTransitioning(true);
       
-      // Update CSS custom property for final position
-      if (sceneRef.current) {
-        sceneRef.current.style.setProperty('--rotatePercent', `${finalPercent}`);
-      }
+      // Update rotation for final position
       setRotatePercent(finalPercent);
       
       // Only update active story index AFTER the transition starts
@@ -317,10 +440,8 @@ const StoryCube = (props) => {
         // Preload the new story and adjacent ones before changing index
         preloadAdjacentStories(newIndex);
         
-        // Small delay to ensure preloading starts before index change
-        setTimeout(() => {
-          setActiveStoryIndex(newIndex);
-        }, 50);
+        // Immediate update - no delay needed since we're using stable keys now
+        setActiveStoryIndex(newIndex);
       }
       
       // Also snap back vertical position
@@ -342,13 +463,7 @@ const StoryCube = (props) => {
   // Handle transition end to reset faces and prepare for next interaction
   const handleTransitionEnd = useCallback(() => {
     if (isTransitioning) {
-      // Update display index to match active index after transition completes
-      setDisplayStoryIndex(activeStoryIndex);
-      
       // Reset to center position after transition
-      if (sceneRef.current) {
-        sceneRef.current.style.setProperty('--rotatePercent', '0');
-      }
       setRotatePercent(0);
       
       // Remove transition class for immediate response on next drag
@@ -357,7 +472,12 @@ const StoryCube = (props) => {
       }
       setIsTransitioning(false);
     }
-  }, [isTransitioning, activeStoryIndex]);
+  }, [isTransitioning]);
+
+  // Update displayStoryIndex immediately when activeStoryIndex changes to reduce flickering
+  useEffect(() => {
+    setDisplayStoryIndex(activeStoryIndex);
+  }, [activeStoryIndex]);
 
   const handleKeyDown = useCallback((event) => {
     if (event.key === 'Escape') {
@@ -369,17 +489,14 @@ const StoryCube = (props) => {
       preloadAdjacentStories(newIndex);
       
       // Animate with CSS transition
-      if (cubeRef.current && sceneRef.current) {
+      if (cubeRef.current) {
         cubeRef.current.classList.add('cube-transition');
-        sceneRef.current.style.setProperty('--rotatePercent', '1');
         setIsTransitioning(true);
         setRotatePercent(1);
       }
       
-      // Update index after short delay
-      setTimeout(() => {
-        setActiveStoryIndex(newIndex);
-      }, 50);
+      // Immediate update for smooth transitions
+      setActiveStoryIndex(newIndex);
     } else if (event.key === 'ArrowRight' && activeStoryIndex < stories.length - 1) {
       const newIndex = activeStoryIndex + 1;
       
@@ -387,17 +504,14 @@ const StoryCube = (props) => {
       preloadAdjacentStories(newIndex);
       
       // Animate with CSS transition
-      if (cubeRef.current && sceneRef.current) {
+      if (cubeRef.current) {
         cubeRef.current.classList.add('cube-transition');
-        sceneRef.current.style.setProperty('--rotatePercent', '-1');
         setIsTransitioning(true);
         setRotatePercent(-1);
       }
       
-      // Update index after short delay
-      setTimeout(() => {
-        setActiveStoryIndex(newIndex);
-      }, 50);
+      // Immediate update for smooth transitions
+      setActiveStoryIndex(newIndex);
     }
   }, [activeStoryIndex]);
 
@@ -420,7 +534,7 @@ const StoryCube = (props) => {
   // Get the three visible story faces for the cube using stable display index
   const getVisibleStories = useCallback(() => {
     const visibleStories = [];
-    const baseIndex = isTransitioning ? displayStoryIndex : activeStoryIndex;
+    const baseIndex = displayStoryIndex; // Always use displayStoryIndex for stable rendering
     
     // Previous story (left face)
     if (baseIndex > 0) {
@@ -451,7 +565,7 @@ const StoryCube = (props) => {
     }
     
     return visibleStories;
-  }, [activeStoryIndex, displayStoryIndex, isTransitioning, preloadedStories]);
+  }, [displayStoryIndex, preloadedStories]); // Remove activeStoryIndex and isTransitioning from deps
 
   const visibleStories = getVisibleStories();
 
@@ -570,9 +684,6 @@ const StoryCube = (props) => {
                     percentage = 0;
                   }
 
-                  if (sceneRef.current) {
-                    sceneRef.current.style.setProperty('--rotatePercent', `${percentage}`);
-                  }
                   setRotatePercent(percentage);
                 }
               }}
@@ -604,18 +715,14 @@ const StoryCube = (props) => {
                   }
                   setIsTransitioning(true);
                   
-                  if (sceneRef.current) {
-                    sceneRef.current.style.setProperty('--rotatePercent', `${finalPercent}`);
-                  }
                   setRotatePercent(finalPercent);
                   
                   if (newIndex !== activeStoryIndex) {
                     // Preload stories before changing index
                     preloadAdjacentStories(newIndex);
                     
-                    setTimeout(() => {
-                      setActiveStoryIndex(newIndex);
-                    }, 50);
+                    // Immediate update for smooth transitions
+                    setActiveStoryIndex(newIndex);
                   }
                 }
               }}
@@ -629,7 +736,6 @@ const StoryCube = (props) => {
                   height: 'calc(100vh - 0px)', // Adjust if needed for mobile
                   position: 'relative',
                   transformStyle: 'preserve-3d',
-                  '--rotatePercent': rotatePercent,
                 }}
               >
               {/* 3D Cube Container */}
@@ -642,7 +748,7 @@ const StoryCube = (props) => {
                   width: '100vw',
                   height: '100vh',
                   transformStyle: 'preserve-3d',
-                  transform: `translateZ(-50vw) rotateY(calc((1 - var(--rotatePercent)) * 90deg * -1))`,
+                  transform: `translateZ(-${cubeDepth}vw) rotateY(${(1 - rotatePercent) * 90}deg)`,
                   willChange: 'transform',
                 }}
               >
@@ -652,25 +758,24 @@ const StoryCube = (props) => {
                   
                   switch (position) {
                     case 'left':
-                      faceTransform = 'rotateY(0deg) translateZ(50vw)';
+                      faceTransform = `rotateY(-90deg) translateZ(${cubeDepth}vw)`;
                       break;
                     case 'front':
-                      faceTransform = 'rotateY(90deg) translateZ(50vw)';
+                      faceTransform = `rotateY(0deg) translateZ(${cubeDepth}vw)`;
                       break;
                     case 'right':
-                      faceTransform = 'rotateY(180deg) translateZ(50vw)';
+                      faceTransform = `rotateY(90deg) translateZ(${cubeDepth}vw)`;
                       break;
                     default:
-                      faceTransform = 'rotateY(90deg) translateZ(50vw)';
+                      faceTransform = `rotateY(0deg) translateZ(${cubeDepth}vw)`;
                   }
                   
                   // Determine if this story should be active
                   const isActive = index === activeStoryIndex;
-                  const shouldRender = isPreloaded || isActive || position === 'front';
                   
                   return (
                     <div
-                      key={`${index}-${position}-${displayStoryIndex}`}
+                      key={`story-face-${index}-${position}`}
                       className="story-face"
                       style={{
                         position: 'absolute',
@@ -687,7 +792,7 @@ const StoryCube = (props) => {
                         borderRadius: '8px',
                       }}
                     >
-                      <Suspense fallback={
+                      {isLoading && position === 'front' ? (
                         <div style={{ 
                           backgroundColor: '#111', 
                           width: '100%', 
@@ -710,56 +815,14 @@ const StoryCube = (props) => {
                           }}></div>
                           Loading story...
                         </div>
-                      }>
-                        {isLoading && position === 'front' ? (
-                          <div style={{ 
-                            backgroundColor: '#111', 
-                            width: '100%', 
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontSize: '18px',
-                            flexDirection: 'column',
-                            gap: '1rem'
-                          }}>
-                            <div style={{
-                              width: '40px',
-                              height: '40px',
-                              border: '3px solid rgba(255,255,255,0.3)',
-                              borderTop: '3px solid white',
-                              borderRadius: '50%',
-                              animation: 'spin 1s linear infinite'
-                            }}></div>
-                            Loading story...
-                          </div>
-                        ) : shouldRender ? (
-                          <StoriesLazy
-                            key={`story-${index}`}
-                            stories={[story]}
-                            defaultInterval={5000}
-                            height="100%"
-                            width="100%"
-                            storyContainerStyles={{ borderRadius: "8px", overflow: "hidden" }}
-                            loop={false}
-                            isPaused={!isActive}
-                          />
-                        ) : (
-                          <div style={{ 
-                            backgroundColor: '#111', 
-                            width: '100%', 
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontSize: '14px'
-                          }}>
-                            Story {index + 1}
-                          </div>
-                        )}
-                      </Suspense>
+                      ) : (
+                        <SimpleStory
+                          key={`story-content-${index}`}
+                          story={story}
+                          isActive={isActive}
+                          isPaused={!isActive}
+                        />
+                      )}
                     </div>
                   );
                 })}
